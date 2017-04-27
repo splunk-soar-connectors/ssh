@@ -1,0 +1,47 @@
+<!--
+    File: readme.html
+
+    Copyright (c) Phantom Cyber Corporation, 2016
+
+    This unpublished material is proprietary to Phantom Cyber.
+    All rights reserved. The methods and
+    techniques described herein are considered trade secrets
+    and/or confidential. Reproduction or distribution, in whole
+    or in part, is forbidden except by express written permission
+    of Phantom Cyber.
+    -->
+
+<h2>Root access permissions</h2>
+<p>
+If the user you are logging in is root (or is otherwise configured to not need to use sudo), then be sure to check the "User is root" box in the asset configuration. Otherwise, you will need to provide a password if you want to run commands that require root access even if an RSA key is specified, as required by your sudoers configuration. If you incorrectly specify that the account is root, or if you incorrectly enter a password in conjunction with an RSA key, then the action may indefinitely hang. 
+</p>
+<h2>Key-based authentication</h2>
+<p>
+Refer to the following steps to install the authentication keys. Note that the key pair must be unencrypted and generated using <code>ssh-keygen</code>.
+</p>
+<p>
+Connect to your Phantom instance and sudo to root, then change to the phantom-worker's home directory.<br>
+</p>
+<a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/1.png">
+    <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/1.png"/>
+</a>
+<p>
+Create a directory for the SSH keys (Note: You must give it the name .ssh), then move any private key files into this directory. In this case, the file <code>id_rsa</code> had been added to user's home directory using scp. It is entirely possible to generate a new key pair from the Phantom VM using <code>ssh-keygen</code> as well.
+<br>
+<a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/2.png">
+    <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/2.png">
+</a>
+<p>
+Once the files are in the correct place, ownership must be set to phantom-worker.<br>
+</p>
+<a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/3.png">
+    <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/3.png">
+</a>
+<p>
+Using the <code>chown</code> command:<br>
+<a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/4.png">
+    <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/4.png">
+</a>
+<p>
+The RSA key should be ready to use in an SSH asset. Based on the above example, configure this by specifying id_rsa as the RSA key file.
+</p>
