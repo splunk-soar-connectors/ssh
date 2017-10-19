@@ -1,7 +1,7 @@
 # --
 # File: phssh_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2014-2017
+# Copyright (c) Phantom Cyber Corporation, 2016-2017
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -920,9 +920,7 @@ class SshConnector(BaseConnector):
         # if best_fit is False, best attempts to fill data will be made
         # new header names will be used in the output in place of the headers= fields.
         results = []
-        # self.debug_print(data.split(newline))
         for line in data.split(newline):
-            # print line.split(newline)
             found_header = False
             for header in headers:
                 if header in line and header != '':
@@ -953,10 +951,8 @@ class SshConnector(BaseConnector):
                     linedata = line.strip().split()
                     if new_header_names:
                         if new_header_names[num] == '' and headers[num] == '':
-                            # self.debug_print(linedata[num])
                             continue
                     elif headers[num] == '':
-                        # self.debug_print(linedata[num])
                         continue
                     if new_header_names:
                         try:
@@ -967,7 +963,7 @@ class SshConnector(BaseConnector):
                         try:
                             temp[headers[num]] = linedata[num]
                         except:
-                            temp[new_header_names[num]] = ''
+                            temp[headers[num]] = ''
             results.append(temp)
         return results
 
@@ -984,11 +980,6 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print("ssh uname", uname_str)
 
-        """
-        if (self.OS_TYPE == self.OS_MAC):
-            action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
-            return action_result.get_status()
-        """
         config = self.get_config()
         passwd = config.get(SSH_JSON_PASSWORD, None)
         root = config.get(SSH_JSON_ROOT, False)
@@ -1028,11 +1019,6 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print("ssh uname", uname_str)
 
-        """
-        if (self.OS_TYPE == self.OS_MAC):
-            action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
-            return action_result.get_status()
-        """
         config = self.get_config()
         passwd = config.get(SSH_JSON_PASSWORD, None)
         root = config.get(SSH_JSON_ROOT, False)
