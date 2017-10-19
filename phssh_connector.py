@@ -1,7 +1,7 @@
 # --
 # File: phssh_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2014-2016
+# Copyright (c) Phantom Cyber Corporation, 2014-2017
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -52,6 +52,8 @@ class SshConnector(BaseConnector):
     ACTION_ID_DELETE_FW_RULE = "ssh_delete_fw_rule"
     ACTION_ID_LIST_CONN = "ssh_list_conn"
     ACTION_ID_GET_FILE = "ssh_get_file"
+    ACTION_ID_GET_MEMORY_USAGE = "get_memory_usage"
+    ACTION_ID_GET_DISK_USAGE = "get_disk_usage"
 
     OS_LINUX = 0
     OS_MAC = 1
@@ -911,6 +913,153 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
+    def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
+        # header_locator should be a list of the headers returned in the results
+        # ie for df -h, this would be ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
+        # if best_fit is True, all rows are expected to have the same number of columns as headers.
+        # if best_fit is False, best attempts to fill data will be made
+        # new header names will be used in the output in place of the headers= fields.
+        results = []
+        # self.debug_print(data.split(newline))
+        for line in data.split(newline):
+            # print line.split(newline)
+            found_header = False
+            for header in headers:
+                if header in line and header != '':
+                    found_header = True
+                    break
+            #
+            temp = {}
+            #
+            if found_header:
+                continue
+            elif len(line.split()) == 0:
+                continue
+            elif best_fit and len(line.split()) != len(headers):
+                temp['error_message'] = SSH_PARSE_HEADER_ERR.format(len(headers), headers, len(line), line)
+                continue
+
+            if best_fit:
+                for num, val in enumerate(line.strip().split()):
+                    if headers[num] == '':
+                        continue
+                    else:
+                        if new_header_names:
+                            temp[new_header_names[num]] = val
+                        else:
+                            temp[headers[num]] = val
+            else:
+                for num in range(0, len(headers)):
+                    linedata = line.strip().split()
+                    if new_header_names:
+                        if new_header_names[num] == '' and headers[num] == '':
+                            # self.debug_print(linedata[num])
+                            continue
+                    elif headers[num] == '':
+                        # self.debug_print(linedata[num])
+                        continue
+                    if new_header_names:
+                        try:
+                            temp[new_header_names[num]] = linedata[num]
+                        except:
+                            temp[new_header_names[num]] = ''
+                    else:
+                        try:
+                            temp[headers[num]] = linedata[num]
+                        except:
+                            temp[new_header_names[num]] = ''
+            results.append(temp)
+        return results
+
+    def _get_disk_usage(self, param):
+        """
+        """
+        action_result = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        endpoint = param[SSH_JSON_ENDPOINT]
+        status_code, uname_str = self._start_connection(endpoint)
+        if (phantom.is_fail(status_code)):
+            action_result.set_status(self.get_status(), self.get_status_message())
+            return action_result.get_status()
+        self.debug_print("ssh uname", uname_str)
+
+        """
+        if (self.OS_TYPE == self.OS_MAC):
+            action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
+            return action_result.get_status()
+        """
+        config = self.get_config()
+        passwd = config.get(SSH_JSON_PASSWORD, None)
+        root = config.get(SSH_JSON_ROOT, False)
+        if root:
+            passwd = None
+        if not root and passwd is None:
+            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+
+        cmd = "df -h"
+
+        status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd)
+
+        if (phantom.is_fail(status_code)):
+            return action_result.get_status()
+
+        if (exit_status):
+            action_result.set_status(phantom.APP_ERROR, "Shell returned an error: \"{}\"".format(stdout))
+            action_result.add_data({"output": stdout})
+            return action_result.get_status()
+
+        action_result.add_data(self._parse_generic(data=stdout,
+                   headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
+                   newline='\n'))
+
+        return action_result.get_status()
+
+    def _get_memory_usage(self, param):
+        """
+        """
+        action_result = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        endpoint = param[SSH_JSON_ENDPOINT]
+        status_code, uname_str = self._start_connection(endpoint)
+        if (phantom.is_fail(status_code)):
+            action_result.set_status(self.get_status(), self.get_status_message())
+            return action_result.get_status()
+        self.debug_print("ssh uname", uname_str)
+
+        """
+        if (self.OS_TYPE == self.OS_MAC):
+            action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
+            return action_result.get_status()
+        """
+        config = self.get_config()
+        passwd = config.get(SSH_JSON_PASSWORD, None)
+        root = config.get(SSH_JSON_ROOT, False)
+        if root:
+            passwd = None
+        if not root and passwd is None:
+            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+
+        cmd = "free -h"
+
+        status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd)
+
+        if (phantom.is_fail(status_code)):
+            return action_result.get_status()
+
+        if (exit_status):
+            action_result.set_status(phantom.APP_ERROR, "Shell returned an error: \"{}\"".format(stdout))
+            action_result.add_data({"output": stdout})
+            return action_result.get_status()
+
+        action_result.add_data(self._parse_generic(data=stdout,
+                       headers=['', 'total', 'used', 'free', 'shared', 'buff/cache', "available"],
+                       newline='\n', best_fit=False,
+                       new_header_names=['Type', 'Total', 'Used', 'Free', 'Shared', 'Buff/Cache', 'Available']))
+
+        return action_result.get_status()
+
     # Close shh client
     def _cleanup(self):
         if (self._ssh_client):
@@ -948,6 +1097,10 @@ class SshConnector(BaseConnector):
             ret_val = self._delete_fw_rule(param)
         elif (action_id == self.ACTION_ID_GET_FILE):
             ret_val = self._get_file(param)
+        elif (action_id == self.ACTION_ID_GET_MEMORY_USAGE):
+            ret_val = self._get_memory_usage(param)
+        elif (action_id == self.ACTION_ID_GET_DISK_USAGE):
+            ret_val = self._get_disk_usage(param)
 
         self._cleanup()
 
