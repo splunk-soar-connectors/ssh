@@ -1,1090 +1,1517 @@
 {
-  "appid": "d37aa7fe-c973-44ee-a164-2ca5bf321b1f",
-  "name": "SSH",
-  "publisher": "Phantom",
-  "description": "This app supports executing various endpoint-based investigative and containment actions like <b>list processes</b>, <b>terminate process</b>, <b>reboot system</b>, <b>execute program</b>,  etc. on an SSH endpoint.",
-  "type": "endpoint",
-  "main_module": "phssh_connector.pyc",
-    "app_version": "1.0.32",
-    "utctime_updated": "2017-05-05T18:42:14.000000Z",
-  "package_name": "phantom_ssh",
-  "product_vendor": "Generic",
-  "product_name": "SSH",
-  "logo": "phantom.png",
-  "product_version_regex": ".*",
-  "min_phantom_version": "1.2.265",
-  "license": "Copyright (c) Phantom Cyber Corporation 2016",
-  "configuration": {
-    "username": {
-      "data_type": "string",
-      "order": 0,
-      "description": "Username",
-      "required": true
+    "appid": "d37aa7fe-c973-44ee-a164-2ca5bf321b1f",
+    "name": "SSH",
+    "publisher": "Phantom",
+    "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
+    "type": "endpoint",
+    "main_module": "phssh_connector.pyc",
+    "app_version": "1.0.33",
+    "utctime_updated": "2017-10-19T18:42:14.000000Z",
+    "package_name": "phantom_ssh",
+    "product_vendor": "Generic",
+    "product_name": "SSH",
+    "logo": "phantom.png",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.0.251",
+    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
+    "configuration": {
+        "username": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Username",
+            "required": true
+        },
+        "root": {
+            "data_type": "boolean",
+            "order": 1,
+            "description": "User is root",
+            "required": false,
+            "default": false
+        },
+        "password": {
+            "data_type": "password",
+            "order": 2,
+            "description": "Password",
+            "required": false
+        },
+        "rsa_key_file": {
+            "data_type": "string",
+            "order": 3,
+            "description": "RSA Key file",
+            "required": false
+        },
+        "test_device": {
+            "data_type": "string",
+            "order": 4,
+            "description": "Device IP/Hostname (for TEST CONNECTIVITY only)",
+            "required": false
+        }
     },
-    "root": {
-      "data_type": "boolean",
-      "order": 1,
-      "description": "User is root",
-      "required": false,
-      "default": false
-    },
-    "password": {
-      "data_type": "password",
-      "order": 2,
-      "description": "Password",
-      "required": false
-    },
-    "rsa_key_file": {
-      "data_type": "string",
-      "order": 3,
-      "description": "RSA Key file",
-      "required": false
-    },
-    "test_device": {
-      "data_type": "string",
-      "order": 4,
-      "description": "Device IP/Hostname (for TEST CONNECTIVITY only)",
-      "required": false
-    }
-  },
-  "actions": [
-    {
-      "action": "test connectivity",
-      "description": "Validates endpoint connection.",
-      "type": "test",
-      "identifier": "test_asset_connectivity",
-      "read_only": false,
-      "parameters": {},
-      "output": [],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "execute program",
-      "description": "Executes a program on the remote machine.",
-      "type": "generic",
-      "identifier": "ssh_execute_command",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP to execute command on",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validates endpoint connection",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": false,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
         },
-        "command": {
-          "data_type": "string",
-          "order": 1,
-          "description": "Command to be executed on endpoint",
-          "required": true
+        {
+            "action": "execute program",
+            "description": "Executes a program on the remote machine",
+            "type": "generic",
+            "identifier": "ssh_execute_command",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to execute command on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "command": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "Command to be executed on endpoint",
+                    "required": true
+                },
+                "timeout": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "Seconds before timeout (Default: 60)",
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.command",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         },
-        "timeout": {
-          "data_type": "numeric",
-          "order": 2,
-          "description": "Seconds before timeout (Default: 60)",
-          "required": false
+        {
+            "action": "list connections",
+            "description": "Lists all the network connections. Requires root privileges. Requires netstat to be installed",
+            "verbose": "Executes the following command<br><code>sudo -S netstat -etnp</code><br>On OS X the following command is executed instead<br><code>sudo -S  lsof -nP -i</code><br>Note that the name of the command in the output is limited to 9 characters.",
+            "type": "investigate",
+            "identifier": "ssh_list_conn",
+            "read_only": true,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to list network connections on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "local_addr": {
+                    "description": "Local ip to filter on",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                "local_port": {
+                    "description": "Local port to match",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "order": 2,
+                    "required": false
+                },
+                "remote_addr": {
+                    "description": "Remote ip to filter on",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 3,
+                    "required": false
+                },
+                "remote_port": {
+                    "description": "Remote port to match",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "order": 4,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Connections",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.connections.*.cmd",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.pid",
+                    "data_type": "string",
+                    "contains": [
+                        "pid"
+                    ],
+                    "column_name": "Pid",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.local_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Local IP",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.local_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "Local Port",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.remote_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Remote IP",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.remote_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "Remote Port",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.uid",
+                    "data_type": "string",
+                    "column_name": "User",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.inode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.rec_q",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.send_q",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.local_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remote_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remote_addr",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.local_addr",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block ip",
+            "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X.",
+            "verbose": "Need to specify either an IP or a port to block.<br>Executes the following command<br><code>sudo -S iptables -I &lt;DIRECTION&gt; -p &lt;PROTOCOL&gt; &lt;IP&gt; &lt;PORT&gt; -j DROP -m &lt;COMMENT&gt;</code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION.<br>Only iptables is supported.",
+            "type": "contain",
+            "identifier": "ssh_block_ip",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to add firewall rule to",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "remote_ip": {
+                    "description": "Remote IP to block",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "primary": true
+                },
+                "remote_port": {
+                    "description": "Remote port to block (allows multiple ports)",
+                    "order": 2,
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                "protocol": {
+                    "description": "Protocol to block. tcp, udp, etc",
+                    "order": 3,
+                    "data_type": "string",
+                    "value_list": [
+                        "all",
+                        "tcp",
+                        "udp",
+                        "udplite",
+                        "icmp",
+                        "esp",
+                        "ah",
+                        "setp"
+                    ]
+                },
+                "direction": {
+                    "description": "Inbound or outbound",
+                    "order": 4,
+                    "data_type": "string",
+                    "value_list": [
+                        "In",
+                        "Out"
+                    ]
+                },
+                "comment": {
+                    "description": "Leave a comment",
+                    "order": 5,
+                    "data_type": "string"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.direction",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.remote_port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remote_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list firewall rules",
+            "description": "Lists the rules in iptables. Requires root privileges. Not supported on OS X",
+            "verbose": "Executes the following command<br><code>sudo -S iptables -L &lt;CHAIN&gt; --line-numbers -n</code><br>Only iptables is supported",
+            "type": "investigate",
+            "identifier": "ssh_list_fw_rules",
+            "read_only": true,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to list firewall rules on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "protocol": {
+                    "description": "Protocol to match",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "port": {
+                    "description": "Port to match",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ],
+                    "order": 2
+                },
+                "chain": {
+                    "description": "Chain to match (INPUT, OUTPUT, etc.)",
+                    "data_type": "string",
+                    "order": 3
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Firewall Rules",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.rules.*.chain",
+                    "data_type": "string",
+                    "column_name": "Chain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.num",
+                    "data_type": "string",
+                    "column_name": "Number",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.target",
+                    "data_type": "string",
+                    "column_name": "Target",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.protocol",
+                    "data_type": "string",
+                    "column_name": "Protocol",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.source",
+                    "data_type": "string",
+                    "column_name": "Source",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.destination",
+                    "data_type": "string",
+                    "column_name": "Destination",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.options",
+                    "data_type": "string",
+                    "column_name": "Options",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.chain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete firewall rule",
+            "description": "Delete a firewall rule. Requires root privileges. Not supported on OS X",
+            "verbose": "Executes the following command<br><code>sudo -S iptables -D &lt;CHAIN&gt; &lt;NUMBER&gt;</code><br>Only iptables is supported",
+            "type": "correct",
+            "identifier": "ssh_delete_fw_rule",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP of endpoint",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "chain": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "Name of chain (INPUT, OUTPUT, etc.)",
+                    "required": true
+                },
+                "number": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "Number of rule to delete",
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.chain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.number",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "reboot system",
+            "description": "Reboot the endpoint (Requires root privileges)",
+            "verbose": "Executes the following command<br><code>sudo -S shutdown -r now</code>",
+            "type": "contain",
+            "identifier": "ssh_reboot_server",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP of server to reboot",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Reboot Endpoint",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string",
+                    "column_name": "Output",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "shutdown system",
+            "description": "Shutdown the endpoint(Requires root privileges)",
+            "verbose": "Executes the following command<br><code>sudo -S shutdown -h now</code>",
+            "type": "contain",
+            "identifier": "ssh_shutdown_server",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP of server to shutdown",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Shutdown Endpoint",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string",
+                    "column_name": "Output",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "terminate process",
+            "description": "Terminate a process (Requires root privileges)",
+            "verbose": "Executes the following command<br><code>sudo -S kill -SIGKILL &lt;PID&gt;</code>",
+            "type": "contain",
+            "identifier": "ssh_kill_process",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP of endpoint",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true
+                },
+                "pid": {
+                    "description": "PID of process to terminate",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "contains": [
+                        "pid"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Terminate Process",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.pid",
+                    "data_type": "numeric",
+                    "column_name": "pid",
+                    "contains": [
+                        "pid"
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string",
+                    "column_name": "shell output",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "logoff user",
+            "description": "Logout a user on endpoint (Requires root privileges)",
+            "verbose": "Executes the following command<br><code>sudo -S pkill -SIGKILL &lt;USER_NAME&gt;</code>",
+            "type": "contain",
+            "identifier": "ssh_logout_user",
+            "read_only": false,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP of endpoint",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true
+                },
+                "user_name": {
+                    "description": "Name of user to logout",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "user name"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Logoff User",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.user_name",
+                    "data_type": "string",
+                    "column_name": "Logged Off",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string",
+                    "column_name": "Output",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list processes",
+            "description": "List processes on endpoint",
+            "verbose": "Executes the following command<br><code>ps c -Ao user,uid,pid,ppid,stime,command</code>",
+            "type": "investigate",
+            "identifier": "ssh_list_processes",
+            "read_only": true,
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.ip_hostname"
+            },
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP of endpoint",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Endpoint Processes",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.processes.*.command",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.pid",
+                    "data_type": "string",
+                    "column_name": "Pid",
+                    "contains": [
+                        "pid"
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.ppid",
+                    "data_type": "string",
+                    "column_name": "Ppid",
+                    "contains": [
+                        " pid"
+                    ],
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.stime",
+                    "data_type": "string",
+                    "column_name": "Process Start Time",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "User",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.processes.*.uid",
+                    "data_type": "string",
+                    "column_name": "UID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_processes",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get disk usage",
+            "description": "Retrieve disk usage from endpoint",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "get_disk_usage",
+            "read_only": true,
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to execute command on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Disk Usage",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 8,
+                    "column_name": "Result Message",
+                    "example_values": [
+                        "Successfully executed command"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "example_values": [
+                        "10.16.0.181"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Use%",
+                    "data_type": "string",
+                    "column_name": "Use%",
+                    "column_order": 2,
+                    "example_values": [
+                        "16%"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Used",
+                    "data_type": "string",
+                    "column_name": "Used",
+                    "column_order": 3,
+                    "example_values": [
+                        "7.6G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Avail",
+                    "data_type": "string",
+                    "column_name": "Avail",
+                    "column_order": 4,
+                    "example_values": [
+                        "43G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Filesystem",
+                    "data_type": "string",
+                    "column_name": "Filesystem",
+                    "column_order": 1,
+                    "example_values": [
+                        "/dev/mapper/centos-root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Mounted on",
+                    "data_type": "string",
+                    "column_name": "Mount Point",
+                    "column_order": 0,
+                    "example_values": [
+                        "/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 5,
+                    "example_values": [
+                        "50G"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get memory usage",
+            "description": "Retrieve memory usage from endpoint",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "get_memory_usage",
+            "read_only": true,
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to execute command on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Memory Usage",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 8,
+                    "column_name": "Result Message",
+                    "example_values": [
+                        "Successfully executed command"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "column_name": "IP/Hostname",
+                    "column_order": 1,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "example_values": [
+                        "10.16.0.181"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Available",
+                    "data_type": "string",
+                    "column_name": "Available",
+                    "column_order": 2,
+                    "example_values": [
+                        "3.2G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Used",
+                    "data_type": "string",
+                    "column_name": "Used",
+                    "column_order": 3,
+                    "example_values": [
+                        "1.8G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Free",
+                    "data_type": "string",
+                    "column_name": "Free",
+                    "column_order": 4,
+                    "example_values": [
+                        "1.1G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Buff/Cache",
+                    "data_type": "string",
+                    "column_name": "Buff/Cache",
+                    "column_order": 5,
+                    "example_values": [
+                        "2.7G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Shared",
+                    "data_type": "string",
+                    "column_name": "Shared",
+                    "column_order": 6,
+                    "example_values": [
+                        "306M"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Total",
+                    "data_type": "string",
+                    "column_name": "Total",
+                    "column_order": 7,
+                    "example_values": [
+                        "5.7G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Type",
+                    "data_type": "string",
+                    "column_name": "Type",
+                    "column_order": 0,
+                    "example_values": [
+                        "Mem:"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get file",
+            "description": "Retrieve a file from endpoint and save it to the vault",
+            "verbose": "File path needs to be a full path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>",
+            "type": "investigate",
+            "identifier": "ssh_get_file",
+            "read_only": true,
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to execute command on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "file_path": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "Full path to file to download",
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get File",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Result Message"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_order": 1,
+                    "column_name": "Vault ID"
+                },
+                {
+                    "data_path": "action_result.summary.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.file_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         }
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.command",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "action_result.parameter.timeout",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "list connections",
-      "description": "Lists all the network connections. Requires root privileges. Requires netstat to be installed.",
-      "verbose": "Executes the following command<br><code>sudo -S netstat -etnp</code><br>On OS X the following command is executed instead<br><code>sudo -S  lsof -nP -i</code><br>Note that the name of the command in the output is limited to 9 characters.",
-      "type": "investigate",
-      "identifier": "ssh_list_conn",
-      "read_only": true,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP to list network connections on",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        },
-        "local_addr": {
-          "description": "Local ip to filter on",
-          "data_type": "string",
-          "order": 1,
-          "required": false,
-          "contains": [ "ip" ]
-        },
-        "local_port": {
-          "description": "Local port to match",
-          "data_type": "string",
-          "contains": [ "port" ],
-          "order": 2,
-          "required": false
-        },
-        "remote_addr": {
-          "description": "Remote ip to filter on",
-          "data_type": "string",
-          "contains": [ "ip" ],
-          "order": 3,
-          "required": false
-        },
-        "remote_port": {
-          "description": "Remote port to match",
-          "data_type": "string",
-          "contains": [ "port" ],
-          "order": 4,
-          "required": false
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "List Connections",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.connections.*.cmd",
-          "data_type": "string",
-          "column_name": "Name",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.pid",
-          "data_type": "string",
-          "contains": [ "pid" ],
-          "column_name": "Pid",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.local_ip",
-          "data_type": "string",
-          "contains": [ "ip" ],
-          "column_name": "Local IP",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.local_port",
-          "data_type": "string",
-          "contains": [ "port" ],
-          "column_name": "Local Port",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.remote_ip",
-          "data_type": "string",
-          "contains": [ "ip" ],
-          "column_name": "Remote IP",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.remote_port",
-          "data_type": "string",
-          "contains": [ "port" ],
-          "column_name": "Remote Port",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.state",
-          "data_type": "string",
-          "column_name": "State",
-          "column_order": 6
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.uid",
-          "data_type": "string",
-          "column_name": "User",
-          "column_order": 7
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.inode",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.rec_q",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.send_q",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.connections.*.protocol",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.local_port",
-          "data_type": "string",
-          "contains": ["port"]
-        },
-        {
-          "data_path": "action_result.parameter.remote_port",
-          "data_type": "string",
-          "contains": ["port"]
-        },
-        {
-          "data_path": "action_result.parameter.remote_addr",
-          "data_type": "string",
-          "contains": ["ip"]
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name"]
-        },
-        {
-          "data_path": "action_result.parameter.local_addr",
-          "data_type": "string",
-          "contains": ["ip"]
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "block ip",
-      "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X.",
-      "verbose": "Need to specify either an IP or a port to block.<br>Executes the following command<br><code>sudo -S iptables -I &lt;DIRECTION&gt; -p &lt;PROTOCOL&gt; &lt;IP&gt; &lt;PORT&gt; -j DROP -m &lt;COMMENT&gt;</code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION.<br>Only iptables is supported.",
-      "type": "contain",
-      "identifier": "ssh_block_ip",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP to add firewall rule to",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        },
-        "remote_ip": {
-          "description": "Remote IP to block",
-          "data_type": "string",
-          "order": 1, 
-          "contains": [ "ip", "host name" ],
-          "primary": true
-        },
-        "remote_port": {
-          "description": "Remote port to block (allows multiple ports)",
-          "order": 2,
-          "data_type": "numeric",
-          "contains": [ "port" ]
-        },
-        "protocol": {
-          "description": "Protocol to block. tcp, udp, etc",
-          "order": 3,
-          "data_type": "string",
-          "value_list": [ "all", "tcp", "udp", "udplite", "icmp", "esp", "ah", "setp" ]
-        },
-        "direction": {
-          "description": "Inbound or outbound",
-          "order": 4,
-          "data_type": "string",
-          "value_list": [ "In", "Out" ]
-        },
-        "comment": {
-          "description": "Leave a comment",
-          "order": 5,
-          "data_type": "string"
-        }
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.comment",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.direction",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.protocol",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.remote_port",
-          "data_type": "numeric",
-          "contains": [ "port" ]
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": ["ip", "host name"]
-        },
-        {
-          "data_path": "action_result.parameter.remote_ip",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "list firewall rules",
-      "description": "Lists the rules in iptables. Requires root privileges. Not supported on OS X",
-      "verbose": "Executes the following command<br><code>sudo -S iptables -L &lt;CHAIN&gt; --line-numbers -n</code><br>Only iptables is supported",
-      "type": "investigate",
-      "identifier": "ssh_list_fw_rules",
-      "read_only": true,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP to list firewall rules on",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        },
-        "protocol": {
-          "description": "Protocol to match",
-          "data_type": "string",
-          "order": 1
-        },
-        "port": {
-          "description": "Port to match",
-          "data_type": "numeric",
-          "contains": [ "port" ],
-          "order": 2
-        },
-        "chain": {
-          "description": "Chain to match (INPUT, OUTPUT, etc.)",
-          "data_type": "string",
-          "order": 3
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "List Firewall Rules",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.rules.*.chain",
-          "data_type": "string",
-          "column_name": "Chain",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.rules.*.num",
-          "data_type": "string",
-          "column_name": "Number",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.rules.*.target",
-          "data_type": "string",
-          "column_name": "Target",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.rules.*.protocol",
-          "data_type": "string",
-          "column_name": "Protocol",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.rules.*.source",
-          "data_type": "string",
-          "column_name": "Source",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.rules.*.destination",
-          "data_type": "string",
-          "column_name": "Destination",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.data.*.rules.*.options",
-          "data_type": "string",
-          "column_name": "Options",
-          "column_order": 6
-        },
-        {
-          "data_path": "action_result.parameter.protocol",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.port",
-          "data_type": "numeric",
-          "contains": [ "port" ]
-        },
-        {
-          "data_path": "action_result.parameter.chain",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "delete firewall rule",
-      "description": "Delete a firewall rule. Requires root privileges. Not supported on OS X",
-      "verbose": "Executes the following command<br><code>sudo -S iptables -D &lt;CHAIN&gt; &lt;NUMBER&gt;</code><br>Only iptables is supported",
-      "type": "correct",
-      "identifier": "ssh_delete_fw_rule",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP of endpoint",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        },
-        "chain": {
-          "data_type": "string",
-          "order": 1,
-          "description": "Name of chain (INPUT, OUTPUT, etc.)",
-          "required": true
-        },
-        "number": {
-          "data_type": "numeric",
-          "order": 2,
-          "description": "Number of rule to delete",
-          "required": true
-        }
-      },
-      "output": [
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "action_result.parameter.chain",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.number",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "reboot system",
-      "description": "Reboot the endpoint. Requires root privileges.",
-      "verbose": "Executes the following command<br><code>sudo -S shutdown -r now</code>",
-      "type": "contain",
-      "identifier": "ssh_reboot_server",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP of server to reboot",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Reboot Endpoint",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "column_name": "Status",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string",
-          "column_name": "Output",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "shutdown system",
-      "description": "Shutdown the endpoint. Requires root privileges.",
-      "verbose": "Executes the following command<br><code>sudo -S shutdown -h now</code>",
-      "type": "contain",
-      "identifier": "ssh_shutdown_server",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP of server to shutdown",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Shutdown Endpoint",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "column_name": "Status",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string",
-          "column_name": "Output",
-          "column_order": 2
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "terminate process",
-      "description": "Terminate a process. Requires root privileges.",
-      "verbose": "Executes the following command<br><code>sudo -S kill -SIGKILL &lt;PID&gt;</code>",
-      "type": "contain",
-      "identifier": "ssh_kill_process",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP of endpoint",
-          "contains": [ "ip", "host name" ],
-          "required": true
-        },
-        "pid": {
-          "description": "PID of process to terminate",
-          "data_type": "numeric",
-          "order": 1,
-          "contains": [ "pid" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Terminate Process",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "column_name": "Status",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.parameter.pid",
-          "data_type": "numeric",
-          "column_name": "pid",
-          "contains": ["pid"],
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string",
-          "column_name": "shell output",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "logoff user",
-      "description": "Logout a user on endpoint. Requires root privileges.",
-      "verbose": "Executes the following command<br><code>sudo -S pkill -SIGKILL &lt;USER_NAME&gt;</code>",
-      "type": "contain",
-      "identifier": "ssh_logout_user",
-      "read_only": false,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP of endpoint",
-          "contains": [ "ip", "host name" ],
-          "required": true
-        },
-        "user_name": {
-          "description": "Name of user to logout",
-          "data_type": "string",
-          "order": 1,
-          "contains": [ "user name" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Logoff User",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.status",
-          "data_type": "string",
-          "column_name": "Status",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.parameter.user_name",
-          "data_type": "string",
-          "column_name": "Logged Off",
-          "contains": ["user name"],
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_name": "Message",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.output",
-          "data_type": "string",
-          "column_name": "Output",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "list processes",
-      "description": "List processes on endpoint.",
-      "verbose": "Executes the following command<br><code>ps c -Ao user,uid,pid,ppid,stime,command</code>",
-      "type": "investigate",
-      "identifier": "ssh_list_processes",
-      "read_only": true,
-      "lock": {
-        "enabled": true,
-        "data_path": "parameters.ip_hostname"
-      },
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP of endpoint",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Endpoint Processes",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.processes.*.command",
-          "data_type": "string",
-          "column_name": "Name",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.processes.*.pid",
-          "data_type": "string",
-          "column_name": "Pid",
-          "contains": [ "pid" ],
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.processes.*.ppid",
-          "data_type": "string",
-          "column_name": "Ppid",
-          "contains": [" pid" ],
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.processes.*.stime",
-          "data_type": "string",
-          "column_name": "Process Start Time",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.processes.*.user",
-          "data_type": "string",
-          "contains": [ "user name" ],
-          "column_name": "User",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.data.*.processes.*.uid",
-          "data_type": "string",
-          "column_name": "UID",
-          "column_order": 6
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "ip", "host name" ]
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_processes",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "get file",
-      "description": "Retrieve a file from endpoint and save it to the vault.",
-      "verbose": "File path needs to be a full path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>",
-      "type": "investigate",
-      "identifier": "ssh_get_file",
-      "read_only": true,
-      "parameters": {
-        "ip_hostname": {
-          "data_type": "string",
-          "order": 0,
-          "description": "Hostname/IP to execute command on",
-          "contains": [ "ip", "host name" ],
-          "required": true,
-          "primary": true
-        },
-        "file_path": {
-          "data_type": "string",
-          "order": 1,
-          "description": "Full path to file to download.",
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Get File",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string",
-          "column_order": 0,
-          "column_name": "Result Message"
-        },
-        {
-          "data_path": "summary.exit_status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary.name",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.summary.vault_id",
-          "data_type": "string",
-          "contains": [ "vault id" ],
-          "column_order": 1,
-          "column_name": "Vault ID"
-        },
-        {
-          "data_path": "action_result.summary.size",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.parameter.file_path",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.ip_hostname",
-          "data_type": "string",
-          "contains": [ "host name", "ip" ]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    }
-  ]
+    ]
 }
