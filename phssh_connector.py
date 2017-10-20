@@ -915,7 +915,7 @@ class SshConnector(BaseConnector):
 
     def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
-        # ie for df -h, this would be ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
+        # ie for df -hP, this would be ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
         # if best_fit is True, all rows are expected to have the same number of columns as headers.
         # if best_fit is False, best attempts to fill data will be made
         # new header names will be used in the output in place of the headers= fields.
@@ -986,7 +986,7 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
 
-        cmd = "df -h"
+        cmd = "df -hP"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd)
 
