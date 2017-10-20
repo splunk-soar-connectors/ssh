@@ -985,8 +985,6 @@ class SshConnector(BaseConnector):
         root = config.get(SSH_JSON_ROOT, False)
         if root:
             passwd = None
-        if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
 
         cmd = "df -h"
 
@@ -1024,8 +1022,6 @@ class SshConnector(BaseConnector):
         root = config.get(SSH_JSON_ROOT, False)
         if root:
             passwd = None
-        if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
 
         cmd = "free -h"
 
