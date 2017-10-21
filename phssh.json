@@ -1218,7 +1218,7 @@
                     "column_name": "Use%",
                     "column_order": 2,
                     "example_values": [
-                        "16"
+                        "15"
                     ]
                 },
                 {
@@ -1227,7 +1227,7 @@
                     "column_name": "Used",
                     "column_order": 3,
                     "example_values": [
-                        "7.6G"
+                        "7.2G"
                     ]
                 },
                 {
@@ -1264,6 +1264,13 @@
                     "column_order": 5,
                     "example_values": [
                         "50G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.raw",
+                    "data_type": "string",
+                    "example_values": [
+                        "/dev/mapper/centos-root     50G  7.2G   43G  15 /"
                     ]
                 }
             ],
@@ -1361,7 +1368,7 @@
                     "column_name": "Available",
                     "column_order": 2,
                     "example_values": [
-                        "3.2G"
+                        "3.1G"
                     ]
                 },
                 {
@@ -1370,7 +1377,7 @@
                     "column_name": "Used",
                     "column_order": 3,
                     "example_values": [
-                        "1.8G"
+                        "1.9G"
                     ]
                 },
                 {
@@ -1416,6 +1423,13 @@
                     "column_order": 0,
                     "example_values": [
                         "Mem:"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.raw",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mem:           5.7G        1.9G        1.1G        306M        2.7G        3.1G"
                     ]
                 }
             ],

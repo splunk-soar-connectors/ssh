@@ -964,6 +964,7 @@ class SshConnector(BaseConnector):
                             temp[headers[num]] = linedata[num]
                         except:
                             temp[headers[num]] = ''
+            temp['raw'] = line
             results.append(temp)
         return results
 
@@ -978,7 +979,6 @@ class SshConnector(BaseConnector):
         if (phantom.is_fail(status_code)):
             action_result.set_status(self.get_status(), self.get_status_message())
             return action_result.get_status()
-        self.debug_print("ssh uname", uname_str)
 
         config = self.get_config()
         passwd = config.get(SSH_JSON_PASSWORD, None)
@@ -998,8 +998,8 @@ class SshConnector(BaseConnector):
             action_result.add_data({"output": stdout})
             return action_result.get_status()
 
-        stdout = stdout.replace("%","")  # clean up % from text
-        result = self._parse_generic(data=stdout,
+        stdout2 = stdout.replace("%","")  # clean up % from text
+        result = self._parse_generic(data=stdout2,
                    headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
                    newline='\n')
         action_result.add_data(result)
@@ -1017,7 +1017,6 @@ class SshConnector(BaseConnector):
         if (phantom.is_fail(status_code)):
             action_result.set_status(self.get_status(), self.get_status_message())
             return action_result.get_status()
-        self.debug_print("ssh uname", uname_str)
 
         config = self.get_config()
         passwd = config.get(SSH_JSON_PASSWORD, None)
@@ -1037,10 +1036,11 @@ class SshConnector(BaseConnector):
             action_result.add_data({"output": stdout})
             return action_result.get_status()
 
-        action_result.add_data(self._parse_generic(data=stdout,
+        result = self._parse_generic(data=stdout,
                        headers=['', 'total', 'used', 'free', 'shared', 'buff/cache', "available"],
                        newline='\n', best_fit=False,
-                       new_header_names=['Type', 'Total', 'Used', 'Free', 'Shared', 'Buff/Cache', 'Available']))
+                       new_header_names=['Type', 'Total', 'Used', 'Free', 'Shared', 'Buff/Cache', 'Available'])
+        action_result.add_data(result)
 
         return action_result.get_status()
 
