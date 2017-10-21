@@ -998,9 +998,11 @@ class SshConnector(BaseConnector):
             action_result.add_data({"output": stdout})
             return action_result.get_status()
 
-        action_result.add_data(self._parse_generic(data=stdout,
+        stdout = stdout.replace("%","")  # clean up % from text
+        result = self._parse_generic(data=stdout,
                    headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
-                   newline='\n'))
+                   newline='\n')
+        action_result.add_data(result)
 
         return action_result.get_status()
 
