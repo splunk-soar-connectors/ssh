@@ -1,7 +1,7 @@
 # --
 # File: phssh_consts.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2014-2016
+# Copyright (c) Phantom Cyber Corporation, 2016-2017
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -50,6 +50,7 @@ SSH_ERR_SHELL_SEND_COMMAND = "On device execution of command '{}' failed"
 SSH_SUCC_CMD_EXEC = "Successfully executed command"
 SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED = "Firewall actions are not supported for OS X"
 SSH_ERR_NEED_PW_FOR_ROOT = "Unable to run commands that require root without a specified password"
+SSH_PARSE_HEADER_ERR = "Provided headers do not match columns in data! Headers: {}-{} - Data: {}-{}"
 
 SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD = "Could not parse output of command '{}'"
 SSH_SHELL_NO_ERRORS = "Shell returned no errors"
