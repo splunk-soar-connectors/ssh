@@ -5,13 +5,12 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.pyc",
-    "app_version": "1.0.39",
-    "utctime_updated": "2017-12-21T03:24:20.000000Z",
+    "app_version": "1.0.37",
+    "utctime_updated": "2017-10-23T20:57:10.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
     "product_name": "SSH",
-    "logo": "logo_phantom.svg",
-    "logo_dark": "logo_phantom_dark.svg",
+    "logo": "phantom.png",
     "product_version_regex": ".*",
     "min_phantom_version": "3.0.251",
     "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
@@ -96,7 +95,15 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -114,14 +121,6 @@
                 {
                     "data_path": "action_result.parameter.timeout",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.output",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.exit_status",
@@ -206,54 +205,19 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.local_addr",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.local_port",
-                    "data_type": "string",
-                    "contains": [
-                        "port"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.remote_addr",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.remote_port",
-                    "data_type": "string",
-                    "contains": [
-                        "port"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.connections.*.cmd",
                     "data_type": "string",
                     "column_name": "Name",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.connections.*.inode",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.connections.*.pid",
+                    "data_type": "string",
+                    "contains": [
+                        "pid"
+                    ],
+                    "column_name": "Pid",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.local_ip",
@@ -274,23 +238,6 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.connections.*.pid",
-                    "data_type": "string",
-                    "contains": [
-                        "pid"
-                    ],
-                    "column_name": "Pid",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.connections.*.protocol",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.connections.*.rec_q",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.connections.*.remote_ip",
                     "data_type": "string",
                     "contains": [
@@ -309,10 +256,6 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.connections.*.send_q",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.connections.*.state",
                     "data_type": "string",
                     "column_name": "State",
@@ -325,8 +268,64 @@
                     "column_order": 7
                 },
                 {
+                    "data_path": "action_result.data.*.connections.*.inode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.rec_q",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.send_q",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.connections.*.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.local_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remote_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remote_addr",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.local_addr",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "summary.exit_status",
@@ -416,7 +415,15 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.data.*.output",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -428,24 +435,8 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.protocol",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.remote_ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
                 },
                 {
                     "data_path": "action_result.parameter.remote_port",
@@ -455,12 +446,20 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.output",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.remote_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "summary.exit_status",
@@ -527,43 +526,10 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.chain",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.port",
-                    "data_type": "numeric",
-                    "contains": [
-                        "port"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.protocol",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.rules.*.chain",
                     "data_type": "string",
                     "column_name": "Chain",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data.*.rules.*.destination",
-                    "data_type": "string",
-                    "column_name": "Destination",
-                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.num",
@@ -572,10 +538,10 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.rules.*.options",
+                    "data_path": "action_result.data.*.rules.*.target",
                     "data_type": "string",
-                    "column_name": "Options",
-                    "column_order": 6
+                    "column_name": "Target",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.protocol",
@@ -590,10 +556,43 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.rules.*.target",
+                    "data_path": "action_result.data.*.rules.*.destination",
                     "data_type": "string",
-                    "column_name": "Target",
-                    "column_order": 2
+                    "column_name": "Destination",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.rules.*.options",
+                    "data_type": "string",
+                    "column_name": "Options",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.chain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -652,11 +651,27 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.chain",
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.output",
                     "data_type": "string"
                 },
                 {
@@ -668,27 +683,11 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.chain",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.number",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.output",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -732,12 +731,10 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_path": "action_result.message",
                     "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
+                    "column_name": "Message",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.output",
@@ -746,10 +743,12 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 1
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "summary.exit_status",
@@ -804,12 +803,10 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_path": "action_result.message",
                     "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
+                    "column_name": "Message",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.output",
@@ -818,17 +815,19 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "summary.exit_status",
+                    "data_path": "summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
                     "data_type": "numeric"
                 },
                 {
@@ -885,14 +884,6 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.pid",
                     "data_type": "numeric",
                     "column_name": "pid",
@@ -902,16 +893,24 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
                     "column_name": "shell output",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 2
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "summary.exit_status",
@@ -975,14 +974,6 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.user_name",
                     "data_type": "string",
                     "column_name": "Logged Off",
@@ -992,16 +983,24 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
                     "column_name": "Output",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 2
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "summary.exit_status",
@@ -1050,18 +1049,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "host name"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.processes.*.command",
                     "data_type": "string",
                     "column_name": "Name",
@@ -1092,12 +1079,6 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.processes.*.uid",
-                    "data_type": "string",
-                    "column_name": "UID",
-                    "column_order": 6
-                },
-                {
                     "data_path": "action_result.data.*.processes.*.user",
                     "data_type": "string",
                     "contains": [
@@ -1107,12 +1088,26 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.processes.*.uid",
+                    "data_type": "string",
+                    "column_name": "UID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1120,6 +1115,10 @@
                 },
                 {
                     "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.exit_status",
                     "data_type": "numeric"
                 },
                 {
@@ -1157,11 +1156,36 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
                         "success"
                     ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 8,
+                    "column_name": "Result Message",
+                    "example_values": [
+                        "Successfully executed command"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -1172,6 +1196,38 @@
                     ],
                     "example_values": [
                         "192.168.0.1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Use%",
+                    "data_type": "string",
+                    "column_name": "Use%",
+                    "column_order": 2,
+                    "example_values": [
+                        "15"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Used",
+                    "data_type": "string",
+                    "column_name": "Used",
+                    "column_order": 3,
+                    "example_values": [
+                        "7.2G"
                     ]
                 },
                 {
@@ -1211,63 +1267,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.Use%",
-                    "data_type": "string",
-                    "column_name": "Use%",
-                    "column_order": 2,
-                    "example_values": [
-                        "15"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.Used",
-                    "data_type": "string",
-                    "column_name": "Used",
-                    "column_order": 3,
-                    "example_values": [
-                        "7.2G"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.*.raw",
                     "data_type": "string",
                     "example_values": [
                         "/dev/mapper/centos-root     50G  7.2G   43G  15 /"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_order": 8,
-                    "column_name": "Result Message",
-                    "example_values": [
-                        "Successfully executed command"
-                    ]
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 }
             ],
@@ -1301,11 +1304,36 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
                         "success"
                     ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 8,
+                    "column_name": "Result Message",
+                    "example_values": [
+                        "Successfully executed command"
+                    ]
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -1321,6 +1349,20 @@
                     ]
                 },
                 {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.*.Available",
                     "data_type": "string",
                     "column_name": "Available",
@@ -1330,12 +1372,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.Buff/Cache",
+                    "data_path": "action_result.data.*.*.Used",
                     "data_type": "string",
-                    "column_name": "Buff/Cache",
-                    "column_order": 5,
+                    "column_name": "Used",
+                    "column_order": 3,
                     "example_values": [
-                        "2.7G"
+                        "1.9G"
                     ]
                 },
                 {
@@ -1345,6 +1387,15 @@
                     "column_order": 4,
                     "example_values": [
                         "1.1G"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.Buff/Cache",
+                    "data_type": "string",
+                    "column_name": "Buff/Cache",
+                    "column_order": 5,
+                    "example_values": [
+                        "2.7G"
                     ]
                 },
                 {
@@ -1375,54 +1426,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.Used",
-                    "data_type": "string",
-                    "column_name": "Used",
-                    "column_order": 3,
-                    "example_values": [
-                        "1.9G"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.*.raw",
                     "data_type": "string",
                     "example_values": [
                         "Mem:           5.7G        1.9G        1.1G        306M        2.7G        3.1G"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_order": 8,
-                    "column_name": "Result Message",
-                    "example_values": [
-                        "Successfully executed command"
-                    ]
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 }
             ],
@@ -1463,8 +1470,39 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Result Message"
+                },
+                {
+                    "data_path": "summary.exit_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_order": 1,
+                    "column_name": "Vault ID"
+                },
+                {
+                    "data_path": "action_result.summary.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.file_path",
@@ -1477,33 +1515,6 @@
                         "host name",
                         "ip"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.vault_id",
-                    "data_type": "string",
-                    "contains": [
-                        "vault id"
-                    ],
-                    "column_order": 1,
-                    "column_name": "Vault ID"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_order": 0,
-                    "column_name": "Result Message"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
