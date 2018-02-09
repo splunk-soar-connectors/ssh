@@ -40,7 +40,7 @@ SSH_JSON_COMMENT = "comment"
 SSH_JSON_NUMBER = "number"
 SSH_JSON_FILE_PATH = "file_path"
 SSH_JSON_TIMEOUT = "timeout"
-SSH_JSON_VAULT_ID = 'file_vault_id'
+SSH_JSON_VAULT_ID = 'vault_id'
 SSH_JSON_FILE_DEST = 'file_destination'
 
 SSH_ERR_CONNECTION_FAILED = "Could not establish ssh connection to server"

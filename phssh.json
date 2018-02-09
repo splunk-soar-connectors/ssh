@@ -1546,7 +1546,7 @@
                     "required": true,
                     "primary": true
                 },
-                "file_vault_id": {
+                "vault_id": {
                     "data_type": "string",
                     "order": 1,
                     "contains": [

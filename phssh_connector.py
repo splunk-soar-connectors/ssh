@@ -926,31 +926,28 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print('ssh uname', uname_str)
         
-        #phantom vault file path
+        # phantom vault file path
         file_path = Vault.get_file_path(param[SSH_JSON_VAULT_ID])
-        self.debug_print('phantom vault file path', file_path)
-        #phantom vault file name
+
+        # phantom vault file name
         dest_file_name = Vault.get_file_info(vault_id=param[SSH_JSON_VAULT_ID])[0]['name']
         destination_path = (
             param[SSH_JSON_FILE_DEST] 
             + ('/' if param[SSH_JSON_FILE_DEST][-1] != '/' else '') 
             + dest_file_name
         )
-        self.debug_print('destination_path', destination_path)
         
         sftp = self._ssh_client.open_sftp()
         try:
             sftp.put(file_path, destination_path)
         except Exception as e:
             sftp.close()
-            action_result.set_status(phantom.APP_ERROR, 'Error putting file', e)
-            return action_result.get_status()
+            return action_result.set_status(phantom.APP_ERROR, 'Error putting file', e)
         sftp.close()
 
-        action_result.set_status(phantom.APP_SUCCESS, 'Transferred file')
         summary = {'file_sent': destination_path }
         action_result.update_summary(summary)
-        return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
