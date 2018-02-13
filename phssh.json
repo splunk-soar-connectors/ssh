@@ -1527,6 +1527,83 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "put file",
+            "description": "Put a file from the vault to another location.",
+            "type": "generic",
+            "identifier": "ssh_put_file",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Hostname/IP to execute command on",
+                    "contains": [
+                        "ip",
+                        "host name"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "vault_id": {
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "description": "Vault ID of file",
+                    "required": true,
+                    "primary": true
+                },
+                "file_destination": {
+                    "description": "File destionation",
+                    "data_type": "string",
+                    "order": 2,
+                    "contains": [
+                        "file path"
+                    ],
+                    "required": true,
+                    "primary": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Put File",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Result Message"
+                },
+                {
+                    "data_path": "summary.file_sent",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "File Transferred"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ]
 }
