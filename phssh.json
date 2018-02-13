@@ -1533,7 +1533,7 @@
             "description": "Put a file from the vault to another location.",
             "type": "generic",
             "identifier": "ssh_put_file",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "ip_hostname": {
                     "data_type": "string",
