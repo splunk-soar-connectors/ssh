@@ -345,7 +345,7 @@
         },
         {
             "action": "block ip",
-            "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X.",
+            "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X",
             "verbose": "Need to specify either an IP or a port to block.<br>Executes the following command<br><code>sudo -S iptables -I &lt;DIRECTION&gt; -p &lt;PROTOCOL&gt; &lt;IP&gt; &lt;PORT&gt; -j DROP -m &lt;COMMENT&gt;</code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION.<br>Only iptables is supported.",
             "type": "contain",
             "identifier": "ssh_block_ip",
