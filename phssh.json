@@ -13,7 +13,7 @@
     "logo": "logo_phantom.svg",
     "logo_dark": "logo_phantom_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.251",
+    "min_phantom_version": "3.0.284",
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "configuration": {
         "username": {
@@ -345,7 +345,7 @@
         },
         {
             "action": "block ip",
-            "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X.",
+            "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X",
             "verbose": "Need to specify either an IP or a port to block.<br>Executes the following command<br><code>sudo -S iptables -I &lt;DIRECTION&gt; -p &lt;PROTOCOL&gt; &lt;IP&gt; &lt;PORT&gt; -j DROP -m &lt;COMMENT&gt;</code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION.<br>Only iptables is supported.",
             "type": "contain",
             "identifier": "ssh_block_ip",
@@ -1530,7 +1530,7 @@
         },
         {
             "action": "put file",
-            "description": "Put a file from the vault to another location.",
+            "description": "Put a file from the vault to another location",
             "type": "generic",
             "identifier": "ssh_put_file",
             "read_only": false,
@@ -1557,7 +1557,7 @@
                     "primary": true
                 },
                 "file_destination": {
-                    "description": "File destionation",
+                    "description": "File destination",
                     "data_type": "string",
                     "order": 2,
                     "contains": [
