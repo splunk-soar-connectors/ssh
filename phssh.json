@@ -56,7 +56,23 @@
             "identifier": "test_asset_connectivity",
             "read_only": false,
             "parameters": {},
-            "output": [],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
             "versions": "EQ(*)"
         },
         {
@@ -965,7 +981,7 @@
         {
             "action": "logoff user",
             "description": "Logout a user on endpoint (Requires root privileges)",
-            "verbose": "Executes the following command<br><code>sudo -S pkill -SIGKILL &lt;USER_NAME&gt;</code>",
+            "verbose": "Executes the following command<br><code>sudo -S pkill -SIGKILL &lt;USER_NAME&gt;</code><br>This will terminate any sessions with this user as well as any other processes which they are running. Be careful when running this with certain users (i.e. root)",
             "type": "contain",
             "identifier": "ssh_logout_user",
             "read_only": false,
