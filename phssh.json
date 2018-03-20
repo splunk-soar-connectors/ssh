@@ -395,6 +395,7 @@
                 "protocol": {
                     "description": "Protocol to block. tcp, udp, etc",
                     "order": 3,
+                    "required": true,
                     "data_type": "string",
                     "value_list": [
                         "all",
@@ -411,6 +412,7 @@
                     "description": "Inbound or outbound",
                     "order": 4,
                     "data_type": "string",
+                    "required": true,
                     "value_list": [
                         "In",
                         "Out"
