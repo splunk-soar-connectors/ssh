@@ -1567,6 +1567,7 @@
             "description": "Put a file from the vault to another location",
             "type": "generic",
             "identifier": "ssh_put_file",
+            "verbose": "File path needs to be a full path. For example, <b>/home/USER/</b> instead of <b>~/USER</b>",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
