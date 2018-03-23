@@ -494,7 +494,7 @@
         {
             "action": "list firewall rules",
             "description": "Lists the rules in iptables. Requires root privileges. Not supported on OS X",
-            "verbose": "Executes the following command<br><code>sudo -S iptables -L &lt;CHAIN&gt; --line-numbers -n</code><br>Only iptables is supported",
+            "verbose": "Executes the following command<br><code>sudo -S iptables -L &lt;CHAIN&gt; --line-numbers -n</code><br>Only iptables is supported.",
             "type": "investigate",
             "identifier": "ssh_list_fw_rules",
             "read_only": true,
@@ -635,7 +635,7 @@
         {
             "action": "delete firewall rule",
             "description": "Delete a firewall rule. Requires root privileges. Not supported on OS X",
-            "verbose": "Executes the following command<br><code>sudo -S iptables -D &lt;CHAIN&gt; &lt;NUMBER&gt;</code><br>Only iptables is supported",
+            "verbose": "Executes the following command<br><code>sudo -S iptables -D &lt;CHAIN&gt; &lt;NUMBER&gt;</code><br>Only iptables is supported.",
             "type": "correct",
             "identifier": "ssh_delete_fw_rule",
             "read_only": false,
@@ -965,7 +965,7 @@
         {
             "action": "logoff user",
             "description": "Logout a user on endpoint (Requires root privileges)",
-            "verbose": "Executes the following command<br><code>sudo -S pkill -SIGKILL &lt;USER_NAME&gt;</code><br>This will terminate any sessions with this user as well as any other processes which they are running. Be careful when running this with certain users (i.e. root)",
+            "verbose": "Executes the following command<br><code>sudo -S pkill -SIGKILL &lt;USER_NAME&gt;</code><br>This will terminate any sessions with this user as well as any other processes which they are running. Be careful when running this with certain users (i.e. root).",
             "type": "contain",
             "identifier": "ssh_logout_user",
             "read_only": false,
@@ -1473,7 +1473,7 @@
         {
             "action": "get file",
             "description": "Retrieve a file from endpoint and save it to the vault",
-            "verbose": "File path needs to be a full path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>",
+            "verbose": "File path needs to be a full path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>.",
             "type": "investigate",
             "identifier": "ssh_get_file",
             "read_only": true,
@@ -1567,6 +1567,7 @@
             "description": "Put a file from the vault to another location",
             "type": "generic",
             "identifier": "ssh_put_file",
+            "verbose": "File path needs to be a full path. For example, <b>/home/USER/</b> instead of <b>~/USER</b>.",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
