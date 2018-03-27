@@ -40,12 +40,14 @@ SSH_JSON_COMMENT = "comment"
 SSH_JSON_NUMBER = "number"
 SSH_JSON_FILE_PATH = "file_path"
 SSH_JSON_TIMEOUT = "timeout"
+SSH_JSON_VAULT_ID = 'vault_id'
+SSH_JSON_FILE_DEST = 'file_destination'
 
 SSH_ERR_CONNECTION_FAILED = "Could not establish ssh connection to server"
 SSH_ERR_READ_FROM_SERVER_FAILED = "Read from device failed"
 SSH_ERR_CONNECTIVITY_TEST = "Connectivity test failed"
 SSH_SUCC_CONNECTIVITY_TEST = "Connectivity test passed"
-SSH_ERR_NO_CONNECTION_ABORT = "Couldn't establish connection wtih server. Action aborted"
+SSH_ERR_NO_CONNECTION_ABORT = "Couldn't establish connection with server. Action aborted"
 SSH_ERR_SHELL_SEND_COMMAND = "On device execution of command '{}' failed"
 SSH_SUCC_CMD_EXEC = "Successfully executed command"
 SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED = "Firewall actions are not supported for OS X"

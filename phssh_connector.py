@@ -54,6 +54,7 @@ class SshConnector(BaseConnector):
     ACTION_ID_GET_FILE = "ssh_get_file"
     ACTION_ID_GET_MEMORY_USAGE = "get_memory_usage"
     ACTION_ID_GET_DISK_USAGE = "get_disk_usage"
+    ACTION_ID_PUT_FILE = "ssh_put_file"
 
     OS_LINUX = 0
     OS_MAC = 1
@@ -116,7 +117,7 @@ class SshConnector(BaseConnector):
                command: command to send
                result:  object used to store the status
                passwd:  password, if command needs to be run with root
-               timeout: how long to wait before terminating program 
+               timeout: how long to wait before terminating program
                suppress: don't send message / heartbeat back to phantom
         """
         try:
@@ -913,6 +914,41 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
+    def _put_file(self, param):
+
+        action_result = ActionResult(dict(param))
+        self.add_action_result(action_result)
+
+        endpoint = param[SSH_JSON_ENDPOINT]
+        status_code, uname_str = self._start_connection(endpoint)
+        if phantom.is_fail(status_code):
+            action_result.set_status(self.get_status(), self.get_status_message())
+            return action_result.get_status()
+        self.debug_print('ssh uname', uname_str)
+
+        # phantom vault file path
+        file_path = Vault.get_file_path(param[SSH_JSON_VAULT_ID])
+
+        # phantom vault file name
+        dest_file_name = Vault.get_file_info(vault_id=param[SSH_JSON_VAULT_ID])[0]['name']
+        destination_path = (
+            param[SSH_JSON_FILE_DEST]
+            + ('/' if param[SSH_JSON_FILE_DEST][-1] != '/' else '')  # noqa
+            + dest_file_name                                         # noqa
+        )
+
+        sftp = self._ssh_client.open_sftp()
+        try:
+            sftp.put(file_path, destination_path)
+        except Exception as e:
+            sftp.close()
+            return action_result.set_status(phantom.APP_ERROR, 'Error putting file', e)
+        sftp.close()
+
+        summary = {'file_sent': destination_path }
+        action_result.update_summary(summary)
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
         # ie for df -hP, this would be ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
@@ -998,7 +1034,7 @@ class SshConnector(BaseConnector):
             action_result.add_data({"output": stdout})
             return action_result.get_status()
 
-        stdout2 = stdout.replace("%","")  # clean up % from text
+        stdout2 = stdout.replace("%", "")  # clean up % from text
         result = self._parse_generic(data=stdout2,
                    headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
                    newline='\n')
@@ -1085,10 +1121,13 @@ class SshConnector(BaseConnector):
             ret_val = self._get_memory_usage(param)
         elif (action_id == self.ACTION_ID_GET_DISK_USAGE):
             ret_val = self._get_disk_usage(param)
+        elif (action_id == self.ACTION_ID_PUT_FILE):
+            ret_val = self._put_file(param)
 
         self._cleanup()
 
         return ret_val
+
 
 if __name__ == '__main__':
 
