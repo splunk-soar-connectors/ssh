@@ -236,6 +236,8 @@ class SshConnector(BaseConnector):
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
 
+        local_file = param.get("local_file")
+
         endpoint = param[SSH_JSON_ENDPOINT]
         status_code, uname_str = self._start_connection(endpoint)
         if (phantom.is_fail(status_code)):
@@ -247,7 +249,12 @@ class SshConnector(BaseConnector):
         #  the data will end up being a string after you recieve it
         timeout = int(param.get(SSH_JSON_TIMEOUT, 60))
         config = self.get_config()
-        cmd = param[SSH_JSON_CMD]
+        script_file = param.get(SSH_JSON_SCRIPT_FILE)
+        if script_file:
+            with open(script_file, 'r') as f:
+                cmd = f.read()
+        else:
+            cmd = param[SSH_JSON_CMD]
         root = config.get(SSH_JSON_ROOT, False)
         # Command needs to be run as root
         if (not root and cmd.split()[0] == "sudo"):
