@@ -85,11 +85,17 @@
                     "data_type": "string",
                     "order": 1,
                     "description": "Command to be executed on endpoint",
-                    "required": true
+                    "required": false
+                },
+                "script_file": {
+                    "data_type": "string",
+                    "order": 2,
+                    "description": "Local path to shell script",
+                    "required": false
                 },
                 "timeout": {
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 3,
                     "description": "Seconds before timeout (Default: 60)",
                     "required": false
                 }
