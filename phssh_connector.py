@@ -236,8 +236,6 @@ class SshConnector(BaseConnector):
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
 
-        local_file = param.get("local_file")
-
         endpoint = param[SSH_JSON_ENDPOINT]
         status_code, uname_str = self._start_connection(endpoint)
         if (phantom.is_fail(status_code)):
