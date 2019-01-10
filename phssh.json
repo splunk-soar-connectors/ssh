@@ -1219,8 +1219,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "example_values": [
                         "192.168.0.1"
@@ -1365,8 +1365,8 @@
                     "column_name": "IP/Hostname",
                     "column_order": 1,
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "example_values": [
                         "192.168.0.1"
@@ -1526,8 +1526,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name",
-                        "ip"
+                        "ip",
+                        "host name"
                     ]
                 },
                 {
