@@ -1,16 +1,8 @@
-# --
 # File: phssh_connector.py
+# Copyright (c) 2016-2019 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 # ---------------
 # Phantom ssh app
 # ---------------
@@ -32,6 +24,7 @@ import socket
 import sys
 import simplejson as json
 import time
+import tempfile
 
 # Timeouts in seconds
 FIRST_RECV_TIMEOUT = 30
@@ -897,7 +890,10 @@ class SshConnector(BaseConnector):
         file_path = param[SSH_JSON_FILE_PATH]
         # /some/dir/file_name
         file_name = file_path.split('/')[-1]
-        vault_path = "/vault/tmp/{}".format(file_name)
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            vault_path = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
+        else:
+            vault_path = tempfile.NamedTemporaryFile(dir="/vault/tmp/", delete=False)
 
         sftp = self._ssh_client.open_sftp()
         try:
@@ -908,7 +904,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
 
         sftp.close()
-        vault_ret = Vault.add_attachment(vault_path, self.get_container_id(), file_name=file_name)
+        vault_ret = Vault.add_attachment(vault_path.name, self.get_container_id(), file_name=file_name)
         if vault_ret.get('succeeded'):
             action_result.set_status(phantom.APP_SUCCESS, "Transferred file")
             summary = {
