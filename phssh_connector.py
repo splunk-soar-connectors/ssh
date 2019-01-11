@@ -1,16 +1,8 @@
-# --
 # File: phssh_connector.py
+# Copyright (c) 2016-2019 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 # ---------------
 # Phantom ssh app
 # ---------------
@@ -32,6 +24,7 @@ import socket
 import sys
 import simplejson as json
 import time
+import tempfile
 
 # Timeouts in seconds
 FIRST_RECV_TIMEOUT = 30
@@ -373,7 +366,7 @@ class SshConnector(BaseConnector):
         USER  UID  PID  PPID  STIME  CMD
         """
         try:
-            l = []  # List to store dictionaries
+            ll = []  # List to store dictionaries
             headers = stdout.splitlines()[0].split()
             rows = stdout.splitlines()
             for row in rows[1:]:
@@ -384,10 +377,10 @@ class SshConnector(BaseConnector):
                         d[headers[i].lower()] = ' '.join(r[i:])
                     else:
                         d[headers[i].lower()] = r[i]
-                l.append(d.copy())
+                ll.append(d.copy())
 
-            result.add_data({"processes": l})
-            result.update_summary({"total_processes": len(l)})
+            result.add_data({"processes": ll})
+            result.update_summary({"total_processes": len(ll)})
 
             # result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
             result.set_status(phantom.APP_SUCCESS)
@@ -510,7 +503,7 @@ class SshConnector(BaseConnector):
             PROTO Rec-Q Send-Q Local_Address Foreign_Address State User Inode Pid/Program_Name
         """
         try:
-            l = []  # List to store dictionaries
+            ll = []  # List to store dictionaries
             rows = stdout.splitlines()
 
             # if (len(rows) <= 1):
@@ -561,9 +554,9 @@ class SshConnector(BaseConnector):
                 except:
                     d["pid"] = ""
                     d["cmd"] = ""
-                l.append(d.copy())
+                ll.append(d.copy())
 
-            result.add_data({"connections": l})
+            result.add_data({"connections": ll})
 
             result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
         except:
@@ -597,7 +590,7 @@ class SshConnector(BaseConnector):
             COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME (STATE)?
         """
         try:
-            l = []  # List to store dictionaries
+            ll = []  # List to store dictionaries
             rows = stdout.splitlines()
 
             if (len(rows) <= 1):
@@ -653,9 +646,9 @@ class SshConnector(BaseConnector):
                     d['state'] = r[9][1:-1]  # Ignore paranthesis
                 except:
                     d['state'] = ""
-                l.append(d.copy())
+                ll.append(d.copy())
 
-            result.add_data({"connections": l})
+            result.add_data({"connections": ll})
 
             result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
         except:
@@ -710,7 +703,7 @@ class SshConnector(BaseConnector):
     def _filter_fw_rules(self, result, stdout, cmd, prot, port):
 
         try:
-            l = []
+            ll = []
             cur_chain = ""
             d = {}
             rows = stdout.splitlines()
@@ -740,10 +733,10 @@ class SshConnector(BaseConnector):
                         if (port and port not in the_rest):
                             continue
                         d["options"] = the_rest
-                        l.append(d.copy())
+                        ll.append(d.copy())
                     i += 1
 
-            result.add_data({"rules": l})
+            result.add_data({"rules": ll})
             result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
         except:
             result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD, cmd)
@@ -897,7 +890,10 @@ class SshConnector(BaseConnector):
         file_path = param[SSH_JSON_FILE_PATH]
         # /some/dir/file_name
         file_name = file_path.split('/')[-1]
-        vault_path = "/vault/tmp/{}".format(file_name)
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            vault_path = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
+        else:
+            vault_path = tempfile.NamedTemporaryFile(dir="/vault/tmp/", delete=False)
 
         sftp = self._ssh_client.open_sftp()
         try:
@@ -908,7 +904,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
 
         sftp.close()
-        vault_ret = Vault.add_attachment(vault_path, self.get_container_id(), file_name=file_name)
+        vault_ret = Vault.add_attachment(vault_path.name, self.get_container_id(), file_name=file_name)
         if vault_ret.get('succeeded'):
             action_result.set_status(phantom.APP_SUCCESS, "Transferred file")
             summary = {
