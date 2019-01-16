@@ -891,9 +891,11 @@ class SshConnector(BaseConnector):
         # /some/dir/file_name
         file_name = file_path.split('/')[-1]
         if hasattr(Vault, 'get_vault_tmp_dir'):
-            vault_path = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
+            vault_tmp_file = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
+            vault_path = Vault.get_vault_tmp_dir() + '/' + file_name
         else:
-            vault_path = tempfile.NamedTemporaryFile(dir="/vault/tmp/", delete=False)
+            vault_tmp_file = tempfile.NamedTemporaryFile(dir="/vault/tmp/", delete=False)
+            vault_path = '/vault/tmp' + '/' + file_name
 
         sftp = self._ssh_client.open_sftp()
         try:
@@ -904,7 +906,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
 
         sftp.close()
-        vault_ret = Vault.add_attachment(vault_path.name, self.get_container_id(), file_name=file_name)
+        vault_ret = Vault.add_attachment(vault_tmp_file.name, self.get_container_id(), file_name=file_name)
         if vault_ret.get('succeeded'):
             action_result.set_status(phantom.APP_SUCCESS, "Transferred file")
             summary = {
