@@ -1,5 +1,7 @@
-phssh_connector.py
-phssh_consts.py
+docker-compose.yml
+Makefile
+.bak*
 .git*
 .idea*
-.bak*
+*.py
+.gitlab-ci.yml

@@ -1,16 +1,8 @@
-# --
 # File: phssh_consts.py
+# Copyright (c) 2016-2019 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 # ---------------
 # Phantom ssh app
 # ---------------
@@ -26,6 +18,7 @@ SSH_JSON_PID = "pid"
 SSH_JSON_USER = "user_name"
 SSH_JSON_UID = "uid"
 SSH_JSON_CMD = "command"
+SSH_JSON_SCRIPT_FILE = "script_file"
 SSH_JSON_EXCL_ROOT = "exclude_root"
 SSH_JSON_LOCAL_ADDR = "local_addr"
 SSH_JSON_LOCAL_PORT = "local_port"
