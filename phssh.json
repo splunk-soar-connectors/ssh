@@ -1502,7 +1502,7 @@
                 "file_path": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Full path of the file to download (including filename)",
+                    "description": "Full path of the file to download (include filename)",
                     "required": true,
                     "primary": true
                 }
