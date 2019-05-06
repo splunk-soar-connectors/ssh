@@ -1502,7 +1502,7 @@
                 "file_path": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Full path to file to download",
+                    "description": "Full path of the file to download (including filename)",
                     "required": true,
                     "primary": true
                 }
@@ -1602,7 +1602,7 @@
                     "primary": true
                 },
                 "file_destination": {
-                    "description": "File destination",
+                    "description": "File destination path (disclude filename)",
                     "data_type": "string",
                     "order": 2,
                     "contains": [
