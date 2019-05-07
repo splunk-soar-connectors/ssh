@@ -1503,6 +1503,9 @@
                     "data_type": "string",
                     "order": 1,
                     "description": "Full path of the file to download (include filename)",
+                    "contains": [
+                        "file path"
+                    ],
                     "required": true,
                     "primary": true
                 }
@@ -1609,7 +1612,7 @@
                         "file path"
                     ],
                     "required": true,
-                    "primary": false
+                    "primary": true
                 }
             },
             "render": {
