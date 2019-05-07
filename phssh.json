@@ -1523,7 +1523,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.file_path",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
