@@ -1502,7 +1502,10 @@
                 "file_path": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Full path to file to download",
+                    "description": "Full path of the file to download (include filename)",
+                    "contains": [
+                        "file path"
+                    ],
                     "required": true,
                     "primary": true
                 }
@@ -1520,7 +1523,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.file_path",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -1602,14 +1608,14 @@
                     "primary": true
                 },
                 "file_destination": {
-                    "description": "File destination",
+                    "description": "File destination path (disclude filename)",
                     "data_type": "string",
                     "order": 2,
                     "contains": [
                         "file path"
                     ],
                     "required": true,
-                    "primary": false
+                    "primary": true
                 }
             },
             "render": {
