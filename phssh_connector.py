@@ -1,5 +1,5 @@
 # File: phssh_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -20,10 +20,16 @@ from phssh_consts import *
 import os
 os.sys.path.insert(0, "{}/paramikossh".format(os.path.dirname(os.path.abspath(__file__))))  # noqa
 import paramiko
+
+paramiko.util.log_to_file("/tmp/blah", level = "DEBUG")  # noqa
+
 import socket
 import sys
 import simplejson as json
 import time
+
+from builtins import str
+
 
 # Timeouts in seconds
 FIRST_RECV_TIMEOUT = 30
@@ -134,7 +140,7 @@ class SshConnector(BaseConnector):
     def _get_output(self, result, timeout, passwd, suppress):
         sendpw = True
         self._shell_channel.settimeout(2)
-        output = ""
+        output = "".encode('UTF-8')
         i = 1
         stime = int(time.time())
         if not suppress:
@@ -166,7 +172,7 @@ class SshConnector(BaseConnector):
             result.set_status(phantom.APP_ERROR, str(e))
             return (result, None, None)
         result.set_status(phantom.APP_SUCCESS)
-        return (result, output, self._shell_channel.recv_exit_status())
+        return (result, output.decode('UTF-8'), self._shell_channel.recv_exit_status())
 
     def _clean_stdout(self, stdout, passwd):
         if (stdout is None):
@@ -1136,7 +1142,7 @@ if __name__ == '__main__':
     pudb.set_trace()
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -1147,6 +1153,6 @@ if __name__ == '__main__':
         connector = SshConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

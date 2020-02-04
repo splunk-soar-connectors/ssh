@@ -3,5 +3,4 @@ Makefile
 .bak*
 .git*
 .idea*
-*.py
 .gitlab-ci.yml
