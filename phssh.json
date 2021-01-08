@@ -1,20 +1,24 @@
 {
     "appid": "d37aa7fe-c973-44ee-a164-2ca5bf321b1f",
     "name": "SSH",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
-    "main_module": "phssh_connector.pyc",
-    "app_version": "1.0.47",
-    "utctime_updated": "2019-01-24T00:33:22.000000Z",
+    "main_module": "phssh_connector.py",
+    "app_version": "2.0.21",
+    "utctime_updated": "2021-01-06T17:37:56.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
     "product_name": "SSH",
-    "logo": "logo_phantom.svg",
-    "logo_dark": "logo_phantom_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.0.1068",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "CentOS Linux 7 (Core)"
+    ],
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -26,26 +30,22 @@
             "data_type": "boolean",
             "order": 1,
             "description": "User is root",
-            "required": false,
             "default": false
         },
         "password": {
             "data_type": "password",
             "order": 2,
-            "description": "Password",
-            "required": false
+            "description": "Password"
         },
         "rsa_key_file": {
             "data_type": "string",
             "order": 3,
-            "description": "RSA Key file",
-            "required": false
+            "description": "RSA Key file"
         },
-        "test_device": {
+        "ip_hostname": {
             "data_type": "string",
             "order": 4,
-            "description": "Device IP/Hostname (for TEST CONNECTIVITY only)",
-            "required": false
+            "description": "Device IP/Hostname (for test connectivity only)"
         }
     },
     "actions": [
@@ -84,30 +84,39 @@
                 "command": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Command to be executed on endpoint",
-                    "required": false
+                    "description": "Command to be executed on endpoint"
                 },
                 "script_file": {
                     "data_type": "string",
                     "order": 2,
-                    "description": "Local path to shell script",
-                    "required": false
+                    "description": "Local path to shell script"
                 },
                 "timeout": {
                     "data_type": "numeric",
                     "order": 3,
                     "description": "Seconds before timeout (Default: 60)",
-                    "required": false
+                    "default": 60
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.command",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Command",
+                    "column_order": 0,
+                    "example_values": [
+                        "ls"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -115,41 +124,71 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.script_file",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Script File",
+                    "column_order": 1,
+                    "example_values": [
+                        "/opt/phantom/<file_name>"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.timeout",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Shell Output",
+                    "column_order": 3,
+                    "example_values": [
+                        "Shell Output"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "data_type": "string",
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Execute Program",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -176,40 +215,40 @@
                     "primary": true
                 },
                 "local_addr": {
-                    "description": "Local ip to filter on",
+                    "description": "Local IP to filter on",
                     "data_type": "string",
                     "order": 1,
-                    "required": false,
                     "contains": [
                         "ip"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "local_port": {
                     "description": "Local port to match",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "port"
                     ],
                     "order": 2,
-                    "required": false
+                    "primary": true
                 },
                 "remote_addr": {
-                    "description": "Remote ip to filter on",
+                    "description": "Remote IP to filter on",
                     "data_type": "string",
                     "contains": [
                         "ip"
                     ],
                     "order": 3,
-                    "required": false
+                    "primary": true
                 },
                 "remote_port": {
                     "description": "Remote port to match",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "port"
                     ],
                     "order": 4,
-                    "required": false
+                    "primary": true
                 }
             },
             "render": {
@@ -221,7 +260,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -229,6 +272,9 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
@@ -236,13 +282,19 @@
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "10.1.16.18"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.local_port",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "port"
+                    ],
+                    "example_values": [
+                        8888
                     ]
                 },
                 {
@@ -250,24 +302,36 @@
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "10.1.19.21"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.remote_port",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "contains": [
                         "port"
+                    ],
+                    "example_values": [
+                        52678
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.cmd",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "sshd:"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.inode",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "159395"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.local_ip",
@@ -276,7 +340,10 @@
                         "ip"
                     ],
                     "column_name": "Local IP",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "10.1.16.18"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.local_port",
@@ -285,7 +352,10 @@
                         "port"
                     ],
                     "column_name": "Local Port",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        8888
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.pid",
@@ -293,16 +363,25 @@
                     "contains": [
                         "pid"
                     ],
-                    "column_name": "Pid",
-                    "column_order": 1
+                    "column_name": "PID",
+                    "column_order": 1,
+                    "example_values": [
+                        "17903"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.protocol",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "tcp"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.rec_q",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.remote_ip",
@@ -311,7 +390,10 @@
                         "ip"
                     ],
                     "column_name": "Remote IP",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "10.1.19.21"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.remote_port",
@@ -320,43 +402,63 @@
                         "port"
                     ],
                     "column_name": "Remote Port",
-                    "column_order": 5
+                    "column_order": 5,
+                    "example_values": [
+                        52678
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.send_q",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.state",
                     "data_type": "string",
                     "column_name": "State",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values": [
+                        "ESTABLISHED"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.connections.*.uid",
                     "data_type": "string",
                     "column_name": "User",
-                    "column_order": 7
+                    "column_order": 7,
+                    "example_values": [
+                        "0"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "data_type": "string",
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -395,15 +497,16 @@
                     "primary": true
                 },
                 "remote_port": {
-                    "description": "Remote port to block (allows multiple ports)",
+                    "description": "Remote port to block",
                     "order": 2,
                     "data_type": "numeric",
                     "contains": [
                         "port"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "protocol": {
-                    "description": "Protocol to block. tcp, udp, etc",
+                    "description": "Protocol to block",
                     "order": 3,
                     "required": true,
                     "data_type": "string",
@@ -437,15 +540,30 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.comment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "comment to add"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.direction",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Direction",
+                    "column_order": 3,
+                    "example_values": [
+                        "In",
+                        "Out"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -453,11 +571,19 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.protocol",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Protocol",
+                    "column_order": 2,
+                    "example_values": [
+                        "tcp"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.remote_ip",
@@ -465,6 +591,11 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "column_name": "Remote IP",
+                    "column_order": 0,
+                    "example_values": [
+                        "10.1.19.21"
                     ]
                 },
                 {
@@ -472,33 +603,57 @@
                     "data_type": "numeric",
                     "contains": [
                         "port"
+                    ],
+                    "column_name": "Remote Port",
+                    "column_order": 1,
+                    "example_values": [
+                        52678
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Shell Output",
+                    "column_order": 5,
+                    "example_values": [
+                        "Shell Output"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "data_type": "string",
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Block IP",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -535,7 +690,8 @@
                     "contains": [
                         "port"
                     ],
-                    "order": 2
+                    "order": 2,
+                    "primary": true
                 },
                 "chain": {
                     "description": "Chain to match (INPUT, OUTPUT, etc.)",
@@ -552,11 +708,18 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.chain",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "INPUT"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -564,6 +727,9 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
@@ -571,73 +737,108 @@
                     "data_type": "numeric",
                     "contains": [
                         "port"
+                    ],
+                    "example_values": [
+                        8888
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.protocol",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "tcp"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.chain",
                     "data_type": "string",
                     "column_name": "Chain",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "INPUT"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.destination",
                     "data_type": "string",
                     "column_name": "Destination",
-                    "column_order": 5
+                    "column_order": 5,
+                    "example_values": [
+                        "0.0.0.0/0"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.num",
                     "data_type": "string",
                     "column_name": "Number",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "1"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.options",
                     "data_type": "string",
                     "column_name": "Options",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values": [
+                        "ctstate RELATED,ESTABLISHED"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.protocol",
                     "data_type": "string",
                     "column_name": "Protocol",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        "tcp"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.source",
                     "data_type": "string",
                     "column_name": "Source",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "0.0.0.0/0"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.target",
                     "data_type": "string",
                     "column_name": "Target",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "DOCKER"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "data_type": "string",
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -681,11 +882,22 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.chain",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Chain",
+                    "column_order": 0,
+                    "example_values": [
+                        "INPUT"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -693,37 +905,64 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.number",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Number",
+                    "column_order": 1,
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Shell Output",
+                    "column_order": 3,
+                    "example_values": [
+                        "Shell Output"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Delete Firewall Rule",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -761,7 +1000,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -769,35 +1012,49 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
                     "column_name": "Output",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "Shell returned no errors"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "column_order": 1,
+                    "example_values": [
+                        "Exit status: -1. Please refer the docs to verify the last reboot time"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -837,7 +1094,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -845,35 +1106,49 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
                     "column_name": "Output",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "Shell returned no errors"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "column_order": 1,
+                    "example_values": [
+                        "Endpoint successfully shutdown. Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -898,7 +1173,8 @@
                         "ip",
                         "host name"
                     ],
-                    "required": true
+                    "required": true,
+                    "primary": true
                 },
                 "pid": {
                     "description": "PID of process to terminate",
@@ -922,7 +1198,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -930,44 +1210,61 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.pid",
                     "data_type": "numeric",
-                    "column_name": "pid",
+                    "column_name": "PID",
                     "contains": [
                         "pid"
                     ],
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        12345
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
-                    "column_name": "shell output",
-                    "column_order": 3
+                    "column_name": "Shell Output",
+                    "column_order": 3,
+                    "example_values": [
+                        "Successfully terminated pid <pid>"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "column_order": 2,
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -992,7 +1289,8 @@
                         "ip",
                         "host name"
                     ],
-                    "required": true
+                    "required": true,
+                    "primary": true
                 },
                 "user_name": {
                     "description": "Name of user to logout",
@@ -1016,7 +1314,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -1024,6 +1326,9 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
@@ -1033,35 +1338,49 @@
                     "contains": [
                         "user name"
                     ],
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "testuser"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
                     "column_name": "Output",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        "Successfully logged off  user: <user>"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "column_order": 2,
+                    "example_values": [
+                        "Command successfully executed and shell returned no errors"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1099,7 +1418,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -1107,43 +1430,61 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.processes.*.command",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "systemd"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.processes.*.pid",
                     "data_type": "string",
-                    "column_name": "Pid",
+                    "column_name": "PID",
                     "contains": [
                         "pid"
                     ],
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "12345"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.processes.*.ppid",
                     "data_type": "string",
-                    "column_name": "Ppid",
+                    "column_name": "PPID",
                     "contains": [
-                        " pid"
+                        "pid"
                     ],
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "2"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.processes.*.stime",
                     "data_type": "string",
                     "column_name": "Process Start Time",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "05:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.processes.*.uid",
                     "data_type": "string",
                     "column_name": "UID",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values": [
+                        "0"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.processes.*.user",
@@ -1152,31 +1493,45 @@
                         "user name"
                     ],
                     "column_name": "User",
-                    "column_order": 5
+                    "column_order": 5,
+                    "example_values": [
+                        "testuser"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_processes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "numeric"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total processes: 10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_processes",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1184,7 +1539,6 @@
         {
             "action": "get disk usage",
             "description": "Retrieve disk usage from endpoint",
-            "verbose": "",
             "type": "investigate",
             "identifier": "get_disk_usage",
             "read_only": true,
@@ -1212,7 +1566,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1288,12 +1643,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.size",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1303,10 +1657,6 @@
                     "example_values": [
                         "Successfully executed command"
                     ]
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1328,7 +1678,6 @@
         {
             "action": "get memory usage",
             "description": "Retrieve memory usage from endpoint",
-            "verbose": "",
             "type": "investigate",
             "identifier": "get_memory_usage",
             "read_only": true,
@@ -1356,7 +1705,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1443,12 +1793,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.size",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1458,10 +1807,6 @@
                     "example_values": [
                         "Successfully executed command"
                     ]
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1502,7 +1847,10 @@
                 "file_path": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Full path to file to download",
+                    "description": "Full path of the file to download (include filename)",
+                    "contains": [
+                        "file path"
+                    ],
                     "required": true,
                     "primary": true
                 }
@@ -1516,11 +1864,21 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.file_path",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ],
+                    "example_values": [
+                        "/home/USER/file.tgz"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
@@ -1528,6 +1886,9 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
@@ -1535,12 +1896,25 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary.exit_status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "file.tgz"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.size",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        412
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.vault_id",
@@ -1549,25 +1923,33 @@
                         "vault id"
                     ],
                     "column_order": 1,
-                    "column_name": "Vault ID"
+                    "column_name": "Vault ID",
+                    "example_values": [
+                        "dc871f816c4d179f3a3cea24b4bc81a67562c"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_order": 0,
-                    "column_name": "Result Message"
-                },
-                {
-                    "data_path": "summary.exit_status",
-                    "data_type": "string"
+                    "column_name": "Result Message",
+                    "example_values": [
+                        "Transferred file"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1602,14 +1984,14 @@
                     "primary": true
                 },
                 "file_destination": {
-                    "description": "File destination",
+                    "description": "File destination path (exclude filename)",
                     "data_type": "string",
                     "order": 2,
                     "contains": [
                         "file path"
                     ],
                     "required": true,
-                    "primary": false
+                    "primary": true
                 }
             },
             "render": {
@@ -1621,13 +2003,20 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.file_destination",
                     "data_type": "string",
                     "contains": [
                         "file path"
+                    ],
+                    "example_values": [
+                        "/home/USER/"
                     ]
                 },
                 {
@@ -1636,6 +2025,9 @@
                     "contains": [
                         "ip",
                         "host name"
+                    ],
+                    "example_values": [
+                        "192.168.0.1"
                     ]
                 },
                 {
@@ -1643,6 +2035,11 @@
                     "data_type": "string",
                     "contains": [
                         "vault id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Vault ID",
+                    "example_values": [
+                        "dc871f816c4d179f3a3cea24b4bc81a67562c"
                     ]
                 },
                 {
@@ -1656,21 +2053,33 @@
                     "column_name": "File Transferred",
                     "contains": [
                         "file path"
+                    ],
+                    "example_values": [
+                        "/home/USER/file.tgz"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_order": 0,
-                    "column_name": "Result Message"
+                    "column_order": 2,
+                    "column_name": "Result Message",
+                    "example_values": [
+                        "File sent: /home/USER/file.tgz"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"

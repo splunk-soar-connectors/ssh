@@ -4,4 +4,4 @@ Makefile
 .git*
 .idea*
 .gitlab-ci.yml
-*.py
+whitesource-results
