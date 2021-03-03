@@ -58,6 +58,7 @@ SSH_JSON_VAULT_ID = 'vault_id'
 SSH_JSON_FILE_DEST = 'file_destination'
 
 SSH_ERR_CONNECTION_FAILED = "Could not establish SSH connection to server"
+SSH_CONNECTION_ESTABLISHED = "Established SSH connection to server"
 SSH_ERR_CONNECTIVITY_TEST = "Test Connectivity failed"
 SSH_SUCC_CONNECTIVITY_TEST = "Test Connectivity passed"
 SSH_ERR_SHELL_SEND_COMMAND = "On device execution of command '{}' failed"
@@ -97,6 +98,6 @@ SSH_ERR_CODE_UNAVAILABLE = "Error code unavailable"
 SSH_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the SSH server. Please check the asset configuration and|or the action parameters."
 
 # constants relating to 'validate_integer'
-SSH_VALID_INT_MSG = "Please provide a valid integer value in the '{param}' action parameter"
-SSH_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive integer value in '{param}' action parameter"
-SSH_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the '{param}' action parameter"
+SSH_VALID_INT_MSG = "Please provide a valid integer value in the '{param}' parameter"
+SSH_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive integer value in the '{param}' parameter"
+SSH_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the '{param}' parameter"
