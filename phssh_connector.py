@@ -1137,7 +1137,7 @@ class SshConnector(BaseConnector):
         file_dest = param[SSH_JSON_FILE_DEST]
 
         # Returning an error if the filename is included in the file_destination path
-        if file_dest.find(dest_file_name) != -1:
+        if dest_file_name in file_dest:
             return action_result.set_status(phantom.APP_ERROR, SSH_EXCLUDE_FILENAME_ERR_MSG)
 
         destination_path = "{}{}{}".format(param[SSH_JSON_FILE_DEST], '/' if param[SSH_JSON_FILE_DEST][-1] != '/' else '', dest_file_name)
