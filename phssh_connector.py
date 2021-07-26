@@ -125,6 +125,7 @@ class SshConnector(BaseConnector):
         self._password = config.get(SSH_JSON_PASSWORD)
         self._root = config.get(SSH_JSON_ROOT, False)
         self._rsa_key_file = config.get(SSH_JSON_RSA_KEY)
+        self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
 
         # integer validation for 'timeout' config parameter
         timeout = config.get(SSH_JSON_TIMEOUT)
@@ -149,11 +150,19 @@ class SshConnector(BaseConnector):
 
         if self._rsa_key_file:
             try:
-                try:
-                    key = paramiko.RSAKey.from_private_key_file("/home/phantom-worker/.ssh/{}".format(self._rsa_key_file))
-                except:
-                    key = paramiko.RSAKey.from_private_key_file("/home/phanru/.ssh/{}".format(self._rsa_key_file))
+                if os.path.exists(self._rsa_key_file):
+                    key = paramiko.RSAKey.from_private_key_file(self._rsa_key_file)
+                else:
+                    ssh_file_path1 = "/home/phantom-worker/.ssh/{}".format(self._rsa_key_file)
+                    ssh_file_path2 = "/home/phanru/.ssh/{}".format(self._rsa_key_file)
+                    if os.path.exists(ssh_file_path1):
+                        key = paramiko.RSAKey.from_private_key_file(ssh_file_path1)
+                    elif os.path.exists(ssh_file_path2):
+                        key = paramiko.RSAKey.from_private_key_file(ssh_file_path2)
+                    else:
+                        raise Exception('No such file or directory')
                 self._password = None
+
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_ERR_CONNECTION_FAILED, err))
@@ -201,18 +210,20 @@ class SshConnector(BaseConnector):
             self._shell_channel = trans.open_session()
 
             self._shell_channel.set_combine_stderr(True)
+            if self._pseudo_terminal:
+                self._shell_channel.get_pty()
 
             self.debug_print("Calling 'exec_command' for command: {}".format(command))
             self._shell_channel.settimeout(SEND_TIMEOUT)
             self._shell_channel.exec_command(command)
             self.debug_print("Calling 'get_output' method for processing the output")
             ret_val, data, exit_status = self._get_output(action_result, timeout, passwd, suppress)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status(), None, None
             output += data
 
             self.debug_print("Cleaning the output")
             output = self._clean_stdout(output, passwd)
+            if phantom.is_fail(action_result.get_status()):
+                return action_result.get_status(), output, exit_status
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_ERR_SHELL_SEND_COMMAND.format(command), err)), None, None
@@ -231,14 +242,20 @@ class SshConnector(BaseConnector):
             while True:
                 ctime = int(time.time())
                 if (timeout and ctime - stime >= timeout):
-                    return action_result.set_status(phantom.APP_ERROR, "Error: Timeout"), None, None
+                    err = 'Error: Timeout after {} seconds'.format(timeout)
+                    try:
+                        output = self._handle_py_ver_compat_for_input_str(output, True).decode("utf-8")
+                    except Exception:
+                        return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(err, SSH_DECODE_OUTPUT_ERR_MSG)), "", 1
+                    return action_result.set_status(phantom.APP_ERROR, err), output, 1
                 elif (self._shell_channel.recv_ready()):
                     output += self._shell_channel.recv(8192)
                     # This is pretty messy but it's just the way it is I guess
                     if (sendpw and passwd):
                         try:
                             self._shell_channel.send("{}\n".format(passwd))
-                            output += self._handle_py_ver_compat_for_input_str("\n", True)
+                            if not self._pseudo_terminal:
+                                output += self._handle_py_ver_compat_for_input_str("\n", True)
                         except socket.error:
                             pass
                         sendpw = False
@@ -252,12 +269,12 @@ class SshConnector(BaseConnector):
                         i = i % 5 + 1
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, err), None, None
+            return action_result.set_status(phantom.APP_ERROR, err), "", None
 
         try:
-            output = output.decode('utf-8')
+            output = self._handle_py_ver_compat_for_input_str(output, True).decode("utf-8")
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, SSH_DECODE_OUTPUT_ERR_MSG), None, None
+            return action_result.set_status(phantom.APP_ERROR, SSH_DECODE_OUTPUT_ERR_MSG), "", 1
 
         return action_result.set_status(phantom.APP_SUCCESS), output, self._shell_channel.recv_exit_status()
 
@@ -346,6 +363,17 @@ class SshConnector(BaseConnector):
         # As it turns out, even if the data type is "numeric" in the json
         # the data will end up being a string after you receive it
 
+        # integer validation for 'timeout' action parameter
+        timeout = param.get(SSH_JSON_TIMEOUT)
+        if timeout is not None:
+            ret_val, timeout = self._validate_integer(action_result, timeout, SSH_JSON_TIMEOUT, False)
+            if phantom.is_fail(ret_val):
+                timeout = self._timeout
+                self.debug_print("Invalid value provided in the timeout parameter of the execute program action. {}".format(SSH_ASSET_TIMEOUT_MSG))
+        else:
+            timeout = self._timeout
+            self.debug_print("No value found in the timeout parameter of the execute program action. {}".format(SSH_ASSET_TIMEOUT_MSG))
+
         script_file = param.get(SSH_JSON_SCRIPT_FILE)
         if script_file:
             try:
@@ -370,10 +398,11 @@ class SshConnector(BaseConnector):
             passwd = ""
 
         self.debug_print("Sending command for execution")
-        status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
+        status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=timeout)
 
         # If command failed to send
         if phantom.is_fail(status_code):
+            action_result.add_data({"output": stdout})
             return action_result.get_status()
 
         action_result = self._output_for_exit_status(action_result, exit_status,
@@ -1035,7 +1064,7 @@ class SshConnector(BaseConnector):
             return action_result
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                stdout + " Is the iptables service running?", SSH_SHELL_NO_ERRORS)
+                "{} Is the iptables service running?".format(stdout), SSH_SHELL_NO_ERRORS)
 
         return action_result
 
@@ -1054,9 +1083,9 @@ class SshConnector(BaseConnector):
         # /some/dir/file_name
         file_name = file_path.split('/')[-1]
         if hasattr(Vault, 'get_vault_tmp_dir'):
-            vault_path = Vault.get_vault_tmp_dir() + '/' + file_name
+            vault_path = '{}/{}'.format(Vault.get_vault_tmp_dir(), file_name)
         else:
-            vault_path = '/vault/tmp' + '/' + file_name
+            vault_path = '/vault/tmp/{}'.format(file_name)
 
         sftp = self._ssh_client.open_sftp()
         try:
@@ -1105,12 +1134,22 @@ class SshConnector(BaseConnector):
 
         # phantom vault file name
         dest_file_name = vault_meta_info[0].get('name')
+        file_dest = param[SSH_JSON_FILE_DEST]
+
+        # Returning an error if the filename is included in the file_destination path
+        if dest_file_name in file_dest:
+            return action_result.set_status(phantom.APP_ERROR, SSH_EXCLUDE_FILENAME_ERR_MSG)
 
         destination_path = "{}{}{}".format(param[SSH_JSON_FILE_DEST], '/' if param[SSH_JSON_FILE_DEST][-1] != '/' else '', dest_file_name)
 
         sftp = self._ssh_client.open_sftp()
         try:
             sftp.put(file_path, destination_path)
+        except FileNotFoundError as e:
+            err = self._get_error_message_from_exception(e)
+            sftp.close()
+            err = "{}. {}".format(err, SSH_FILE_NOT_FOUND_ERR_MSG)
+            return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_ERR_MSG.format(err=err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             sftp.close()

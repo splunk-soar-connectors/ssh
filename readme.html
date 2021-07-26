@@ -4,53 +4,58 @@
   SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
   without a valid written license from Splunk Inc. is PROHIBITED.
 -->
-<p><b>Note:</b> This app will only support the Linux Distributions and MAC OS X. The app internally uses the Paramiko module to establish an SSH connection with the server, and as per the official docs of Paramiko(refer <a href="http://www.paramiko.org/faq.html#paramiko-doesn-t-work-with-my-cisco-windows-or-other-non-unix-system">this</a>), they do not support non-standard SSH implementations or host systems.</p>
+<p><b>Note:</b> This app will only support Linux distributions and Mac OS X. The app internally uses the Paramiko module to establish an SSH connection with the server, and per the official Paramiko documentation, it does not support non-standard SSH implementations or host systems. See <a href="http://www.paramiko.org/faq.html#paramiko-doesn-t-work-with-my-cisco-windows-or-other-non-unix-system" target="_blank">this link</a> for more details.</p>
 
 <h2>Root access permissions</h2>
 <p>
 If you are logging in as the root user (or a user otherwise configured to not need to use sudo), then be sure to check the "User is root" box in the asset configuration. Otherwise, you will have to provide a password if you want to run commands that require root access even if the RSA key is specified, as required by your sudoers configuration. If you incorrectly specify that the account is root, or if you incorrectly enter a password in conjunction with the RSA key, then the action may indefinitely hang. 
 </p>
+<h2>Pseudo-terminal</h2>
+<p>In certain scenarios, it may be necessary to enable the pseudo-terminal for <code>sudo</code> commands where <b>requiretty</b> is enabled in the sudoers config. In that case, you can:</p>
+<ul>
+    <li>disable the <b>requiretty</b> requirement on the server-side or</li>
+    <li>enable pseudo-terminal in your asset config.</li>
+</ul>
+<p>However, if it is not required, it should be disabled. Otherwise, the app may hang indefinitely when used with servers where pseudo-terminals are not supported.</p>
+
 <h2>Key-based authentication</h2>
 <p>
 Refer to the following steps to install the authentication keys. Note that the key pair must be unencrypted and generated using <code>ssh-keygen</code>.
 </p>
-<p><b>Note:</b> The screenshots attached below are for Non-NRI instances. For NRI instances, consider <b>/home/phanru</b> as the home directory and <b>phanru</b> as the user. The steps would remain the same with only a minor change that the user would be <b>phanru</b> instead of <b>phantom-worker</b>.</p>
-<p>
+<p><b>Note:</b> The screenshots attached below are for Non-NRI instances having <b>/home/phantom-worker</b> as the home directory. For NRI instances, consider <b>/home/phanru</b> as the home directory and <b>phanru</b> as the user. If you are using different user, then consider <b>/home/{your_user_name}</b> as the home directory and <b>{your_user_name}</b> as the user. The steps would remain the same with only a minor change that the user would be <b>phanru</b> or <b>{your_user_name}</b> instead of <b>phantom-worker</b>.</p>
 <ol>
-<li>Connect to your Phantom instance and sudo to root, then change to the phantom-worker's home directory. For an NRI instance, change to phanru's home directory using <code>cd /home/phanru/</code><br></li>
-</p>
+<p><li>Connect to your Phantom instance and sudo to root. Change the current directory to phantom-worker's home directory using <code>cd /home/phantom-worker/</code><br></li></p>
 <a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/1.png">
     <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/1.png"/>
 </a>
-<p>
-<li>Create a directory for the SSH keys (Note: You must give it the name .ssh), then move any private key files into this directory. In this case, the file <code>id_rsa</code> had been added to the user's home directory using scp. It is entirely possible to generate a new key pair from the Phantom VM using <code>ssh-keygen</code> as well.</li>
-<br>
+<p><li>Create a directory for the SSH keys (NOTE: You must give it the name .ssh). If you already have a key pair, move the private key files into this directory. In this case, the file <code>id_rsa</code> has been added to the user's home directory using scp.
+</li></p>
 <a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/2.png">
     <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/2.png">
 </a>
-<br>
-<p>To generate the key using <code>ssh-keygen</code>, refer to the following steps:
+<p><br>It is entirely possible to generate a new key pair from the Phantom VM. To generate the key using <code>ssh-keygen</code>, refer to the following steps:
 <ul>
-    <li>Generate ssh-key using command <code>ssh-keygen -f .ssh/id_rsa</code></li>
-    <li>Once an SSH key has been created, the ssh-copy-id command can be used to install it as an authorized key on the server. Use the command <code>ssh-copy-id -i  .ssh/id_rsa  &lt;user&gt;@&lt;host&gt;</code>. Here, the &lt;user&gt; and &lt;host&gt; refer to the SSH server where we want to execute the SSH commands/Phantom actions. The copying may ask for a password or other authentication for the server.
+    <li>Generate a new key pair using the command <code>ssh-keygen -f .ssh/id_rsa</code></li>
+    <li>Once an SSH key pair has been generated, the ssh-copy-id command can be used to install it as an authorized key on the server. Use the command <code>ssh-copy-id -i .ssh/id_rsa &lt;user&gt;@&lt;host&gt;</code>. Here, the &lt;user&gt; and &lt;host&gt; refer to the SSH server where you want to execute the SSH commands/Phantom actions. The command may request a password or other authentication for the server.
     </li>
 </ul>
 The RSA public key is successfully added to the server.
 </p>
 <p>
-<li>Once the files are in the correct place, ownership must be set to phantom-worker. For an NRI instance, ownership must be set to phanru using <code>chown -R phanru:phanru .ssh</code><br></li>
+<li>Once the files are in the correct place, the ownership of the .ssh directory needs to be set using <code>chown -R phantom-worker:phantom-worker .ssh</code>. To verify whether the owner of the .ssh folder is successfully updated or not use the <code>ls -lAR</code> command.<br></li>
 </p>
 <a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/3.png">
     <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/3.png">
 </a>
-<p>
+<p><br>
 Using the <code>chown</code> command:<br>
+</p>
 <a href="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/4.png">
     <img src="/app_resource/ssh_d37aa7fe-c973-44ee-a164-2ca5bf321b1f/img/4.png">
 </a>
 </ol>
 <p>
-The RSA key should be ready to use in the SSH asset. Based on the above example, configure this by specifying 'id_rsa' as the RSA key file.
+The RSA key should be ready to use in the SSH asset. Based on the above example, configure this by specifying 'id_rsa' as the RSA key file. In the case of a different user, the absolute path to the key must be specified. For example, if keys are added using username <b>testuser</b> having the home directory <b>/home/testuser</b> then <b>/home/testuser/.ssh/id_rsa</b> should be specified as the RSA key file.
 </p>
 
 <h2>Verify Last Reboot Time</h2>

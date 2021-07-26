@@ -5,8 +5,8 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
-    "app_version": "2.1.7",
-    "utctime_updated": "2021-03-05T18:43:30.000000Z",
+    "app_version": "2.2.3",
+    "utctime_updated": "2021-07-23T12:09:38.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
     "product_name": "SSH",
@@ -52,6 +52,12 @@
             "order": 5,
             "description": "Seconds before timeout (will be applicable for all actions)",
             "default": 120
+        },
+        "pseudo_terminal": {
+            "data_type": "boolean",
+            "order": 6,
+            "description": "Enable pseudo-terminal when running sudo commands",
+            "default": false
         }
     },
     "actions": [
@@ -68,6 +74,7 @@
         {
             "action": "execute program",
             "description": "Executes a program on the remote machine",
+            "verbose": "Please provide a value for the 'timeout' parameter when executing continuous commands such as 'ping' so that the action does not keep running indefinitely.",
             "type": "generic",
             "identifier": "ssh_execute_command",
             "read_only": false,
@@ -96,6 +103,12 @@
                     "data_type": "string",
                     "order": 2,
                     "description": "Local path to shell script"
+                },
+                "timeout": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "Seconds before timeout. If an invalid value or 0 is entered, the timeout specified in the asset configuration will be used (default: 0)",
+                    "default": 0
                 }
             },
             "output": [
@@ -139,6 +152,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.output",
                     "data_type": "string",
                     "column_name": "Shell Output",
@@ -178,9 +198,10 @@
             ],
             "render": {
                 "width": 12,
+                "height": 5,
                 "title": "Execute Program",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "view": "ssh_view.display_ssh_output"
             },
             "versions": "EQ(*)"
         },
@@ -458,7 +479,7 @@
         },
         {
             "action": "block ip",
-            "description": "Add an iptables rule to linux server. Requires root privileges. Not supported on OS X",
+            "description": "Add an iptables rule to the Linux server. Requires root privileges. Not supported on OS X",
             "verbose": "Need to specify either an IP or a port to block.<br>Executes the following command<br><code>sudo -S iptables -I &lt;DIRECTION&gt; -p &lt;PROTOCOL&gt; &lt;IP&gt; &lt;PORT&gt; -j DROP -m &lt;COMMENT&gt;</code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION.<br>Only iptables is supported.",
             "type": "contain",
             "identifier": "ssh_block_ip",
@@ -1820,8 +1841,8 @@
         },
         {
             "action": "get file",
-            "description": "Retrieve a file from endpoint and save it to the vault",
-            "verbose": "File path needs to be a full path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>.",
+            "description": "Retrieve a file from the endpoint and save it to the vault",
+            "verbose": "The file path needs to be an absolute path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>.",
             "type": "investigate",
             "identifier": "ssh_get_file",
             "read_only": true,
@@ -1952,7 +1973,7 @@
             "description": "Put a file from the vault to another location",
             "type": "generic",
             "identifier": "ssh_put_file",
-            "verbose": "File path needs to be a full path. For example, <b>/home/USER/</b> instead of <b>~/USER</b>.",
+            "verbose": "The file path needs to be an absolute path. For example, <b>/home/USER/</b> instead of <b>~/USER</b>.",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {

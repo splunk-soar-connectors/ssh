@@ -54,6 +54,7 @@ SSH_JSON_COMMENT = "comment"
 SSH_JSON_NUMBER = "number"
 SSH_JSON_FILE_PATH = "file_path"
 SSH_JSON_TIMEOUT = "timeout"
+SSH_JSON_PSEUDO_TERMINAL = "pseudo_terminal"
 SSH_JSON_VAULT_ID = 'vault_id'
 SSH_JSON_FILE_DEST = 'file_destination'
 
@@ -91,6 +92,9 @@ SSH_LOGOFF_USER_MSG = "Successfully logged off user: '{username}'"
 SSH_GET_FILE_ERR_MSG = "Error getting file. {err}"
 SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_ERR_MSG = "Unable to retreive vault item details"
 SSH_PUT_FILE_ERR_MSG = "Error putting file. {err}"
+SSH_EXCLUDE_FILENAME_ERR_MSG = "Error: Do not include filename in the file destination"
+SSH_FILE_NOT_FOUND_ERR_MSG = "Please verify that the provided file destination exists and make sure the filename is not included in it"
+SSH_ASSET_TIMEOUT_MSG = "Considering the timeout value from the asset configuration"
 
 # constants relating to 'get_error_message_from_exception'
 SSH_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
