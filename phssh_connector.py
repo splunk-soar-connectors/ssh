@@ -33,7 +33,6 @@ except:
     from urllib import unquote
 
 os.sys.path.insert(0, "{}/paramikossh".format(os.path.dirname(os.path.abspath(__file__))))
-paramiko.util.log_to_file("/tmp/blah", level="DEBUG")
 
 
 class SshConnector(BaseConnector):
