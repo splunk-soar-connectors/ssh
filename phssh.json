@@ -5,15 +5,15 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
-    "app_version": "2.2.4",
-    "utctime_updated": "2021-07-26T05:28:56.000000Z",
+    "app_version": "2.3.4",
+    "utctime_updated": "2021-11-18T09:17:33.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
     "product_name": "SSH",
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "CentOS Linux 7 (Core)"
@@ -1486,7 +1486,7 @@
                     "data_path": "action_result.data.*.processes.*.stime",
                     "data_type": "string",
                     "column_name": "Process Start Time",
-                    "column_order": 4,
+                    "column_order": 3,
                     "example_values": [
                         "05:00"
                     ]
@@ -1495,7 +1495,7 @@
                     "data_path": "action_result.data.*.processes.*.uid",
                     "data_type": "string",
                     "column_name": "UID",
-                    "column_order": 6,
+                    "column_order": 5,
                     "example_values": [
                         "0"
                     ]
@@ -1507,7 +1507,7 @@
                         "user name"
                     ],
                     "column_name": "User",
-                    "column_order": 5,
+                    "column_order": 4,
                     "example_values": [
                         "testuser"
                     ]
@@ -1666,7 +1666,7 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_order": 8,
+                    "column_order": 6,
                     "column_name": "Result Message",
                     "example_values": [
                         "Successfully executed command"
