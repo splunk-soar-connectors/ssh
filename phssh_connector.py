@@ -15,26 +15,24 @@
 #
 #
 # Phantom App imports
+import os
+import socket
+import sys
+import time
+from socket import gaierror as SocketError
+
+import paramiko
 import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-from phantom.vault import Vault as Vault
 import phantom.rules as ph_rules
+import simplejson as json
+from bs4 import UnicodeDammit
+from paramiko.ssh_exception import AuthenticationException, BadHostKeyException
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+from phantom.vault import Vault as Vault
 
 # Import local
 from phssh_consts import *
-
-import socket
-import sys
-import simplejson as json
-import time
-from bs4 import UnicodeDammit
-
-import os
-import paramiko
-from socket import gaierror as SocketError
-from paramiko.ssh_exception import BadHostKeyException
-from paramiko.ssh_exception import AuthenticationException
 
 try:
     from urllib.parse import unquote

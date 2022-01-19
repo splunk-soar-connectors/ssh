@@ -16,7 +16,7 @@ and limitations under the License.
 
 <h2>Root access permissions</h2>
 <p>
-If you are logging in as the root user (or a user otherwise configured to not need to use sudo), then be sure to check the "User is root" box in the asset configuration. Otherwise, you will have to provide a password if you want to run commands that require root access even if the RSA key is specified, as required by your sudoers configuration. If you incorrectly specify that the account is root, or if you incorrectly enter a password in conjunction with the RSA key, then the action may indefinitely hang. 
+If you are logging in as the root user (or a user otherwise configured to not need to use sudo), then be sure to check the "User is root" box in the asset configuration. Otherwise, you will have to provide a password if you want to run commands that require root access even if the RSA key is specified, as required by your sudoers configuration. If you incorrectly specify that the account is root, or if you incorrectly enter a password in conjunction with the RSA key, then the action may indefinitely hang.
 </p>
 <h2>Pseudo-terminal</h2>
 <p>In certain scenarios, it may be necessary to enable the pseudo-terminal for <code>sudo</code> commands where <b>requiretty</b> is enabled in the sudoers config. In that case, you can:</p>
