@@ -1,12 +1,12 @@
 [comment]: # "Auto-generated SOAR connector documentation"
 # SSH
 
-Publisher: Splunk
-Connector Version: 2\.3\.6
-Product Vendor: Generic
-Product Name: SSH
-Product Version Supported (regex): "\.\*"
-Minimum Product Version: 5\.0\.0
+Publisher: Splunk  
+Connector Version: 2\.3\.6  
+Product Vendor: Generic  
+Product Name: SSH  
+Product Version Supported (regex): "\.\*"  
+Minimum Product Version: 5\.0\.0  
 
 This app supports executing various endpoint\-based investigative and containment actions on an SSH endpoint
 
@@ -63,7 +63,7 @@ minor change that the user would be **phanru** or **{your_user_name}** instead o
 .
 
 1.  Connect to your Phantom instance and sudo to root. Change the current directory to
-    phantom-worker's home directory using `       cd /home/phantom-worker/      `
+    phantom-worker's home directory using `       cd /home/phantom-worker/      `  
 
     [![](img/1.png)](img/1.png)
 
@@ -73,7 +73,7 @@ minor change that the user would be **phanru** or **{your_user_name}** instead o
 
     [![](img/2.png)](img/2.png)
 
-
+      
     It is entirely possible to generate a new key pair from the Phantom VM. To generate the key
     using `       ssh-keygen      ` , refer to the following steps:
 
@@ -88,11 +88,11 @@ minor change that the user would be **phanru** or **{your_user_name}** instead o
 
 3.  Once the files are in the correct place, the ownership of the .ssh directory needs to be set
     using `      chown -R phantom-worker:phantom-worker .ssh     ` . To verify whether the owner of
-    the .ssh folder is successfully updated or not use the `      ls -lAR     ` command.
+    the .ssh folder is successfully updated or not use the `      ls -lAR     ` command.  
     [![](img/3.png)](img/3.png)
 
-
-    Using the `       chown      ` command:
+      
+    Using the `       chown      ` command:  
 
     [![](img/4.png)](img/4.png)
 
@@ -121,39 +121,39 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **timeout** |  optional  | numeric | Seconds before timeout \(will be applicable for all actions\)
 **pseudo\_terminal** |  optional  | boolean | Enable pseudo\-terminal when running sudo commands
 
-### Supported Actions
-[test connectivity](#action-test-connectivity) - Validates endpoint connection
-[execute program](#action-execute-program) - Executes a program on the remote machine
-[list connections](#action-list-connections) - Lists all the network connections\. Requires root privileges\. Requires netstat to be installed
-[block ip](#action-block-ip) - Add an iptables rule to the Linux server\. Requires root privileges\. Not supported on OS X
-[list firewall rules](#action-list-firewall-rules) - Lists the rules in iptables\. Requires root privileges\. Not supported on OS X
-[delete firewall rule](#action-delete-firewall-rule) - Delete a firewall rule\. Requires root privileges\. Not supported on OS X
-[reboot system](#action-reboot-system) - Reboot the endpoint \(Requires root privileges\)
-[shutdown system](#action-shutdown-system) - Shutdown the endpoint\(Requires root privileges\)
-[terminate process](#action-terminate-process) - Terminate a process \(Requires root privileges\)
-[logoff user](#action-logoff-user) - Logout a user on endpoint \(Requires root privileges\)
-[list processes](#action-list-processes) - List processes on endpoint
-[get disk usage](#action-get-disk-usage) - Retrieve disk usage from endpoint
-[get memory usage](#action-get-memory-usage) - Retrieve memory usage from endpoint
-[get file](#action-get-file) - Retrieve a file from the endpoint and save it to the vault
-[put file](#action-put-file) - Put a file from the vault to another location
+### Supported Actions  
+[test connectivity](#action-test-connectivity) - Validates endpoint connection  
+[execute program](#action-execute-program) - Executes a program on the remote machine  
+[list connections](#action-list-connections) - Lists all the network connections\. Requires root privileges\. Requires netstat to be installed  
+[block ip](#action-block-ip) - Add an iptables rule to the Linux server\. Requires root privileges\. Not supported on OS X  
+[list firewall rules](#action-list-firewall-rules) - Lists the rules in iptables\. Requires root privileges\. Not supported on OS X  
+[delete firewall rule](#action-delete-firewall-rule) - Delete a firewall rule\. Requires root privileges\. Not supported on OS X  
+[reboot system](#action-reboot-system) - Reboot the endpoint \(Requires root privileges\)  
+[shutdown system](#action-shutdown-system) - Shutdown the endpoint\(Requires root privileges\)  
+[terminate process](#action-terminate-process) - Terminate a process \(Requires root privileges\)  
+[logoff user](#action-logoff-user) - Logout a user on endpoint \(Requires root privileges\)  
+[list processes](#action-list-processes) - List processes on endpoint  
+[get disk usage](#action-get-disk-usage) - Retrieve disk usage from endpoint  
+[get memory usage](#action-get-memory-usage) - Retrieve memory usage from endpoint  
+[get file](#action-get-file) - Retrieve a file from the endpoint and save it to the vault  
+[put file](#action-put-file) - Put a file from the vault to another location  
 
 ## action: 'test connectivity'
 Validates endpoint connection
 
-Type: **test**
+Type: **test**  
 Read only: **False**
 
 #### Action Parameters
 No parameters are required for this action
 
 #### Action Output
-No Output
+No Output  
 
 ## action: 'execute program'
 Executes a program on the remote machine
 
-Type: **generic**
+Type: **generic**  
 Read only: **False**
 
 Please provide a value for the 'timeout' parameter when executing continuous commands such as 'ping' so that the action does not keep running indefinitely\.
@@ -161,29 +161,29 @@ Please provide a value for the 'timeout' parameter when executing continuous com
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name`
-**command** |  optional  | Command to be executed on endpoint | string |
-**script\_file** |  optional  | Local path to shell script | string |
-**timeout** |  optional  | Seconds before timeout\. If an invalid value or 0 is entered, the timeout specified in the asset configuration will be used \(default\: 0\) | numeric |
+**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name` 
+**command** |  optional  | Command to be executed on endpoint | string | 
+**script\_file** |  optional  | Local path to shell script | string | 
+**timeout** |  optional  | Seconds before timeout\. If an invalid value or 0 is entered, the timeout specified in the asset configuration will be used \(default\: 0\) | numeric | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.command | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.script\_file | string |
-action\_result\.parameter\.timeout | numeric |
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.command | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.script\_file | string | 
+action\_result\.parameter\.timeout | numeric | 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'list connections'
 Lists all the network connections\. Requires root privileges\. Requires netstat to be installed
 
-Type: **investigate**
+Type: **investigate**  
 Read only: **True**
 
 Executes the following command<br><code>sudo \-S netstat \-etnp</code><br>On OS X the following command is executed instead<br><code>sudo \-S  lsof \-nP \-i</code><br>Note that the name of the command in the output is limited to 9 characters\.
@@ -191,42 +191,42 @@ Executes the following command<br><code>sudo \-S netstat \-etnp</code><br>On OS 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to list network connections on | string |  `ip`  `host name`
-**local\_addr** |  optional  | Local IP to filter on | string |  `ip`
-**local\_port** |  optional  | Local port to match | numeric |  `port`
-**remote\_addr** |  optional  | Remote IP to filter on | string |  `ip`
-**remote\_port** |  optional  | Remote port to match | numeric |  `port`
+**ip\_hostname** |  required  | Hostname/IP to list network connections on | string |  `ip`  `host name` 
+**local\_addr** |  optional  | Local IP to filter on | string |  `ip` 
+**local\_port** |  optional  | Local port to match | numeric |  `port` 
+**remote\_addr** |  optional  | Remote IP to filter on | string |  `ip` 
+**remote\_port** |  optional  | Remote port to match | numeric |  `port` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.local\_addr | string |  `ip`
-action\_result\.parameter\.local\_port | numeric |  `port`
-action\_result\.parameter\.remote\_addr | string |  `ip`
-action\_result\.parameter\.remote\_port | numeric |  `port`
-action\_result\.data\.\*\.connections\.\*\.cmd | string |
-action\_result\.data\.\*\.connections\.\*\.inode | string |
-action\_result\.data\.\*\.connections\.\*\.local\_ip | string |  `ip`
-action\_result\.data\.\*\.connections\.\*\.local\_port | string |  `port`
-action\_result\.data\.\*\.connections\.\*\.pid | string |  `pid`
-action\_result\.data\.\*\.connections\.\*\.protocol | string |
-action\_result\.data\.\*\.connections\.\*\.rec\_q | string |
-action\_result\.data\.\*\.connections\.\*\.remote\_ip | string |  `ip`
-action\_result\.data\.\*\.connections\.\*\.remote\_port | string |  `port`
-action\_result\.data\.\*\.connections\.\*\.send\_q | string |
-action\_result\.data\.\*\.connections\.\*\.state | string |
-action\_result\.data\.\*\.connections\.\*\.uid | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.local\_addr | string |  `ip` 
+action\_result\.parameter\.local\_port | numeric |  `port` 
+action\_result\.parameter\.remote\_addr | string |  `ip` 
+action\_result\.parameter\.remote\_port | numeric |  `port` 
+action\_result\.data\.\*\.connections\.\*\.cmd | string | 
+action\_result\.data\.\*\.connections\.\*\.inode | string | 
+action\_result\.data\.\*\.connections\.\*\.local\_ip | string |  `ip` 
+action\_result\.data\.\*\.connections\.\*\.local\_port | string |  `port` 
+action\_result\.data\.\*\.connections\.\*\.pid | string |  `pid` 
+action\_result\.data\.\*\.connections\.\*\.protocol | string | 
+action\_result\.data\.\*\.connections\.\*\.rec\_q | string | 
+action\_result\.data\.\*\.connections\.\*\.remote\_ip | string |  `ip` 
+action\_result\.data\.\*\.connections\.\*\.remote\_port | string |  `port` 
+action\_result\.data\.\*\.connections\.\*\.send\_q | string | 
+action\_result\.data\.\*\.connections\.\*\.state | string | 
+action\_result\.data\.\*\.connections\.\*\.uid | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'block ip'
 Add an iptables rule to the Linux server\. Requires root privileges\. Not supported on OS X
 
-Type: **contain**
+Type: **contain**  
 Read only: **False**
 
 Need to specify either an IP or a port to block\.<br>Executes the following command<br><code>sudo \-S iptables \-I &lt;DIRECTION&gt; \-p &lt;PROTOCOL&gt; &lt;IP&gt; &lt;PORT&gt; \-j DROP \-m &lt;COMMENT&gt;</code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION\.<br>Only iptables is supported\.
@@ -234,33 +234,33 @@ Need to specify either an IP or a port to block\.<br>Executes the following comm
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to add firewall rule to | string |  `ip`  `host name`
-**remote\_ip** |  optional  | Remote IP to block | string |  `ip`  `host name`
-**remote\_port** |  optional  | Remote port to block | numeric |  `port`
-**protocol** |  required  | Protocol to block | string |
-**direction** |  required  | Inbound or outbound | string |
-**comment** |  optional  | Leave a comment | string |
+**ip\_hostname** |  required  | Hostname/IP to add firewall rule to | string |  `ip`  `host name` 
+**remote\_ip** |  optional  | Remote IP to block | string |  `ip`  `host name` 
+**remote\_port** |  optional  | Remote port to block | numeric |  `port` 
+**protocol** |  required  | Protocol to block | string | 
+**direction** |  required  | Inbound or outbound | string | 
+**comment** |  optional  | Leave a comment | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.comment | string |
-action\_result\.parameter\.direction | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.protocol | string |
-action\_result\.parameter\.remote\_ip | string |  `ip`  `host name`
-action\_result\.parameter\.remote\_port | numeric |  `port`
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.comment | string | 
+action\_result\.parameter\.direction | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.protocol | string | 
+action\_result\.parameter\.remote\_ip | string |  `ip`  `host name` 
+action\_result\.parameter\.remote\_port | numeric |  `port` 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'list firewall rules'
 Lists the rules in iptables\. Requires root privileges\. Not supported on OS X
 
-Type: **investigate**
+Type: **investigate**  
 Read only: **True**
 
 Executes the following command<br><code>sudo \-S iptables \-L &lt;CHAIN&gt; \-\-line\-numbers \-n</code><br>Only iptables is supported\.
@@ -268,35 +268,35 @@ Executes the following command<br><code>sudo \-S iptables \-L &lt;CHAIN&gt; \-\-
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to list firewall rules on | string |  `ip`  `host name`
-**protocol** |  optional  | Protocol to match | string |
-**port** |  optional  | Port to match | numeric |  `port`
-**chain** |  optional  | Chain to match \(INPUT, OUTPUT, etc\.\) | string |
+**ip\_hostname** |  required  | Hostname/IP to list firewall rules on | string |  `ip`  `host name` 
+**protocol** |  optional  | Protocol to match | string | 
+**port** |  optional  | Port to match | numeric |  `port` 
+**chain** |  optional  | Chain to match \(INPUT, OUTPUT, etc\.\) | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.chain | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.port | numeric |  `port`
-action\_result\.parameter\.protocol | string |
-action\_result\.data\.\*\.rules\.\*\.chain | string |
-action\_result\.data\.\*\.rules\.\*\.destination | string |
-action\_result\.data\.\*\.rules\.\*\.num | string |
-action\_result\.data\.\*\.rules\.\*\.options | string |
-action\_result\.data\.\*\.rules\.\*\.protocol | string |
-action\_result\.data\.\*\.rules\.\*\.source | string |
-action\_result\.data\.\*\.rules\.\*\.target | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.chain | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.port | numeric |  `port` 
+action\_result\.parameter\.protocol | string | 
+action\_result\.data\.\*\.rules\.\*\.chain | string | 
+action\_result\.data\.\*\.rules\.\*\.destination | string | 
+action\_result\.data\.\*\.rules\.\*\.num | string | 
+action\_result\.data\.\*\.rules\.\*\.options | string | 
+action\_result\.data\.\*\.rules\.\*\.protocol | string | 
+action\_result\.data\.\*\.rules\.\*\.source | string | 
+action\_result\.data\.\*\.rules\.\*\.target | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'delete firewall rule'
 Delete a firewall rule\. Requires root privileges\. Not supported on OS X
 
-Type: **correct**
+Type: **correct**  
 Read only: **False**
 
 Executes the following command<br><code>sudo \-S iptables \-D &lt;CHAIN&gt; &lt;NUMBER&gt;</code><br>Only iptables is supported\.
@@ -304,27 +304,27 @@ Executes the following command<br><code>sudo \-S iptables \-D &lt;CHAIN&gt; &lt;
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name`
-**chain** |  required  | Name of chain \(INPUT, OUTPUT, etc\.\) | string |
-**number** |  required  | Number of rule to delete | numeric |
+**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name` 
+**chain** |  required  | Name of chain \(INPUT, OUTPUT, etc\.\) | string | 
+**number** |  required  | Number of rule to delete | numeric | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.chain | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.number | numeric |
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.chain | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.number | numeric | 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'reboot system'
 Reboot the endpoint \(Requires root privileges\)
 
-Type: **contain**
+Type: **contain**  
 Read only: **False**
 
 Executes the following command<br><code>sudo \-S shutdown \-r now</code>
@@ -332,23 +332,23 @@ Executes the following command<br><code>sudo \-S shutdown \-r now</code>
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP of server to reboot | string |  `ip`  `host name`
+**ip\_hostname** |  required  | Hostname/IP of server to reboot | string |  `ip`  `host name` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'shutdown system'
 Shutdown the endpoint\(Requires root privileges\)
 
-Type: **contain**
+Type: **contain**  
 Read only: **False**
 
 Executes the following command<br><code>sudo \-S shutdown \-h now</code>
@@ -356,23 +356,23 @@ Executes the following command<br><code>sudo \-S shutdown \-h now</code>
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP of server to shutdown | string |  `ip`  `host name`
+**ip\_hostname** |  required  | Hostname/IP of server to shutdown | string |  `ip`  `host name` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'terminate process'
 Terminate a process \(Requires root privileges\)
 
-Type: **contain**
+Type: **contain**  
 Read only: **False**
 
 Executes the following command<br><code>sudo \-S kill \-SIGKILL &lt;PID&gt;</code>
@@ -380,25 +380,25 @@ Executes the following command<br><code>sudo \-S kill \-SIGKILL &lt;PID&gt;</cod
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name`
-**pid** |  required  | PID of process to terminate | numeric |  `pid`
+**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name` 
+**pid** |  required  | PID of process to terminate | numeric |  `pid` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.pid | numeric |  `pid`
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.pid | numeric |  `pid` 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'logoff user'
 Logout a user on endpoint \(Requires root privileges\)
 
-Type: **contain**
+Type: **contain**  
 Read only: **False**
 
 Executes the following command<br><code>sudo \-S pkill \-SIGKILL &lt;USER\_NAME&gt;</code><br>This will terminate any sessions with this user as well as any other processes which they are running\. Be careful when running this with certain users \(i\.e\. root\)\.
@@ -406,25 +406,25 @@ Executes the following command<br><code>sudo \-S pkill \-SIGKILL &lt;USER\_NAME&
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name`
-**user\_name** |  required  | Name of user to logout | string |  `user name`
+**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name` 
+**user\_name** |  required  | Name of user to logout | string |  `user name` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.user\_name | string |  `user name`
-action\_result\.data\.\*\.output | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.user\_name | string |  `user name` 
+action\_result\.data\.\*\.output | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'list processes'
 List processes on endpoint
 
-Type: **investigate**
+Type: **investigate**  
 Read only: **True**
 
 Executes the following command<br><code>ps c \-Ao user,uid,pid,ppid,stime,command</code>
@@ -432,86 +432,86 @@ Executes the following command<br><code>ps c \-Ao user,uid,pid,ppid,stime,comman
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name`
+**ip\_hostname** |  required  | Hostname/IP of endpoint | string |  `ip`  `host name` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.data\.\*\.processes\.\*\.command | string |
-action\_result\.data\.\*\.processes\.\*\.pid | string |  `pid`
-action\_result\.data\.\*\.processes\.\*\.ppid | string |  `pid`
-action\_result\.data\.\*\.processes\.\*\.stime | string |
-action\_result\.data\.\*\.processes\.\*\.uid | string |
-action\_result\.data\.\*\.processes\.\*\.user | string |  `user name`
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.summary\.total\_processes | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.data\.\*\.processes\.\*\.command | string | 
+action\_result\.data\.\*\.processes\.\*\.pid | string |  `pid` 
+action\_result\.data\.\*\.processes\.\*\.ppid | string |  `pid` 
+action\_result\.data\.\*\.processes\.\*\.stime | string | 
+action\_result\.data\.\*\.processes\.\*\.uid | string | 
+action\_result\.data\.\*\.processes\.\*\.user | string |  `user name` 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.summary\.total\_processes | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'get disk usage'
 Retrieve disk usage from endpoint
 
-Type: **investigate**
+Type: **investigate**  
 Read only: **True**
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name`
+**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.data\.\*\.\*\.Avail | string |
-action\_result\.data\.\*\.\*\.Filesystem | string |
-action\_result\.data\.\*\.\*\.Mounted on | string |
-action\_result\.data\.\*\.\*\.Size | string |
-action\_result\.data\.\*\.\*\.Use% | string |
-action\_result\.data\.\*\.\*\.Used | string |
-action\_result\.data\.\*\.\*\.raw | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.data\.\*\.\*\.Avail | string | 
+action\_result\.data\.\*\.\*\.Filesystem | string | 
+action\_result\.data\.\*\.\*\.Mounted on | string | 
+action\_result\.data\.\*\.\*\.Size | string | 
+action\_result\.data\.\*\.\*\.Use% | string | 
+action\_result\.data\.\*\.\*\.Used | string | 
+action\_result\.data\.\*\.\*\.raw | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'get memory usage'
 Retrieve memory usage from endpoint
 
-Type: **investigate**
+Type: **investigate**  
 Read only: **True**
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name`
+**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.data\.\*\.\*\.Available | string |
-action\_result\.data\.\*\.\*\.Buff/Cache | string |
-action\_result\.data\.\*\.\*\.Free | string |
-action\_result\.data\.\*\.\*\.Shared | string |
-action\_result\.data\.\*\.\*\.Total | string |
-action\_result\.data\.\*\.\*\.Type | string |
-action\_result\.data\.\*\.\*\.Used | string |
-action\_result\.data\.\*\.\*\.raw | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.data\.\*\.\*\.Available | string | 
+action\_result\.data\.\*\.\*\.Buff/Cache | string | 
+action\_result\.data\.\*\.\*\.Free | string | 
+action\_result\.data\.\*\.\*\.Shared | string | 
+action\_result\.data\.\*\.\*\.Total | string | 
+action\_result\.data\.\*\.\*\.Type | string | 
+action\_result\.data\.\*\.\*\.Used | string | 
+action\_result\.data\.\*\.\*\.raw | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'get file'
 Retrieve a file from the endpoint and save it to the vault
 
-Type: **investigate**
+Type: **investigate**  
 Read only: **True**
 
 The file path needs to be an absolute path\. For example, <b>/home/USER/file\.tgz</b> instead of <b>~/file\.tgz</b>\.
@@ -519,28 +519,28 @@ The file path needs to be an absolute path\. For example, <b>/home/USER/file\.tg
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name`
-**file\_path** |  required  | Full path of the file to download \(include filename\) | string |  `file path`
+**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name` 
+**file\_path** |  required  | Full path of the file to download \(include filename\) | string |  `file path` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.file\_path | string |  `file path`
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.data | string |
-action\_result\.summary\.exit\_status | numeric |
-action\_result\.summary\.name | string |
-action\_result\.summary\.size | numeric |
-action\_result\.summary\.vault\_id | string |  `vault id`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.file\_path | string |  `file path` 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.data | string | 
+action\_result\.summary\.exit\_status | numeric | 
+action\_result\.summary\.name | string | 
+action\_result\.summary\.size | numeric | 
+action\_result\.summary\.vault\_id | string |  `vault id` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'put file'
 Put a file from the vault to another location
 
-Type: **generic**
+Type: **generic**  
 Read only: **False**
 
 The file path needs to be an absolute path\. For example, <b>/home/USER/</b> instead of <b>~/USER</b>\.
@@ -548,19 +548,19 @@ The file path needs to be an absolute path\. For example, <b>/home/USER/</b> ins
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name`
-**vault\_id** |  required  | Vault ID of file | string |  `vault id`
-**file\_destination** |  required  | File destination path \(exclude filename\) | string |  `file path`
+**ip\_hostname** |  required  | Hostname/IP to execute command on | string |  `ip`  `host name` 
+**vault\_id** |  required  | Vault ID of file | string |  `vault id` 
+**file\_destination** |  required  | File destination path \(exclude filename\) | string |  `file path` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.file\_destination | string |  `file path`
-action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name`
-action\_result\.parameter\.vault\_id | string |  `vault id`
-action\_result\.data | string |
-action\_result\.summary\.file\_sent | string |  `file path`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.file\_destination | string |  `file path` 
+action\_result\.parameter\.ip\_hostname | string |  `ip`  `host name` 
+action\_result\.parameter\.vault\_id | string |  `vault id` 
+action\_result\.data | string | 
+action\_result\.summary\.file\_sent | string |  `file path` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric | 
