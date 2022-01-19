@@ -375,7 +375,8 @@ class SshConnector(BaseConnector):
             ret_val, timeout = self._validate_integer(action_result, timeout, SSH_JSON_TIMEOUT, False)
             if phantom.is_fail(ret_val):
                 timeout = self._timeout
-                self.debug_print("Invalid value provided in the timeout parameter of the execute program action. {}".format(SSH_ASSET_TIMEOUT_MSG))
+                self.debug_print("Invalid value provided in the timeout parameter of the execute program action. {}".format(
+                    SSH_ASSET_TIMEOUT_MSG))
         else:
             timeout = self._timeout
             self.debug_print("No value found in the timeout parameter of the execute program action. {}".format(SSH_ASSET_TIMEOUT_MSG))
@@ -674,7 +675,8 @@ class SshConnector(BaseConnector):
             action_result.add_data({"output": stdout})
             if not stdout:
                 return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_NO_SHELL_OUTPUT_ERR_MSG, SSH_IS_NETSTAT_INSTALLED_MSG))
-            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout), SSH_IS_NETSTAT_INSTALLED_MSG))
+            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(
+                SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout), SSH_IS_NETSTAT_INSTALLED_MSG))
 
         action_result = self._parse_connections(action_result, stdout, cmd,
                             local_addr, local_port, remote_addr, remote_port)
@@ -1350,13 +1352,14 @@ class SshConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    # import sys
+    import sys
+
     import pudb
     pudb.set_trace()
 
     if (len(sys.argv) < 2):
         print("No test json specified as input")
-        exit(0)
+        sys.exit(0)
 
     with open(sys.argv[1]) as f:
         in_json = f.read()
@@ -1368,4 +1371,4 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)

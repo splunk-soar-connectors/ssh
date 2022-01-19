@@ -107,7 +107,8 @@ SSH_ASSET_TIMEOUT_MSG = "Considering the timeout value from the asset configurat
 # constants relating to 'get_error_message_from_exception'
 SSH_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
 SSH_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-SSH_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the SSH server. Please check the asset configuration and|or the action parameters."
+SSH_UNICODE_DAMMIT_TYPE_ERR_MSG = ("Error occurred while connecting to the SSH server. ",
+"Please check the asset configuration and|or the action parameters.")
 
 # constants relating to 'validate_integer'
 SSH_VALID_INT_MSG = "Please provide a valid integer value in the '{param}' parameter"
