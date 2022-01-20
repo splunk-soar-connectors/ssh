@@ -2,7 +2,7 @@
 # SSH
 
 Publisher: Splunk  
-Connector Version: 2\.3\.6  
+Connector Version: 2\.3\.8  
 Product Vendor: Generic  
 Product Name: SSH  
 Product Version Supported (regex): "\.\*"  
@@ -10,8 +10,8 @@ Minimum Product Version: 5\.0\.0
 
 This app supports executing various endpoint\-based investigative and containment actions on an SSH endpoint
 
-[comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2016-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # "  Copyright (c) 2016-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
