@@ -1,12 +1,20 @@
 # File: phssh_consts.py
-# Copyright (c) 2016-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
-# ---------------
+# Copyright (c) 2016-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 # Phantom ssh app
-# ---------------
-
 # action ids
 ACTION_ID_EXEC_COMMAND = "ssh_execute_command"
 ACTION_ID_REBOOT_SERVER = "ssh_reboot_server"
@@ -99,7 +107,8 @@ SSH_ASSET_TIMEOUT_MSG = "Considering the timeout value from the asset configurat
 # constants relating to 'get_error_message_from_exception'
 SSH_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
 SSH_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-SSH_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the SSH server. Please check the asset configuration and|or the action parameters."
+SSH_UNICODE_DAMMIT_TYPE_ERR_MSG = ("Error occurred while connecting to the SSH server. ",
+"Please check the asset configuration and|or the action parameters.")
 
 # constants relating to 'validate_integer'
 SSH_VALID_INT_MSG = "Please provide a valid integer value in the '{param}' parameter"
