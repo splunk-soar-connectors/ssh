@@ -2,7 +2,7 @@
 # SSH
 
 Publisher: Splunk  
-Connector Version: 2\.3\.8  
+Connector Version: 2\.3\.10  
 Product Vendor: Generic  
 Product Name: SSH  
 Product Version Supported (regex): "\.\*"  
