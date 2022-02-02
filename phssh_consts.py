@@ -41,7 +41,7 @@ SEND_TIMEOUT = 2
 SSH_JSON_DEVICE = "ip_hostname"
 SSH_JSON_USERNAME = "username"
 SSH_JSON_ROOT = "root"
-SSH_JSON_PASSWORD = "password"
+SSH_JSON_PASSWORD = "password"  # pragma: allowlist secret
 SSH_JSON_RSA_KEY = "rsa_key_file"
 
 SSH_JSON_ENDPOINT = "ip_hostname"
@@ -91,7 +91,7 @@ SSH_UNABLE_TO_READ_SCRIPT_FILE_ERR_MSG = "Error occurred while reading '{script_
 SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_ERR_MSG = "Please provide either a 'command' or 'script_file' to be executed on endpoint"
 SSH_VERIFY_LAST_REBOOT_TIME_MSG = "Please refer the docs to verify the last reboot time"
 SSH_ENDPOINT_SHUTDOWN_MSG = "Endpoint successfully shutdown"
-SSH_PWD_OR_RSA_KEY_NOT_SPECIFIED_ERR_MSG = "Please specify either a password or RSA key to establish the connection"
+SSH_PWD_OR_RSA_KEY_NOT_SPECIFIED_ERR_MSG = "Please specify either a password or RSA key to establish the connection"  # pragma: allowlist secret
 SSH_HOSTNAME_OR_IP_NOT_SPECIFIED_ERR_MSG = "Please specify either a hostname or IP to establish the connection"
 SSH_REMOTE_IP_OR_PORT_NOT_SPECIFIED_ERR_MSG = "Please specify either a remote ip or port to block"
 SSH_PID_TERMINATED_MSG = "Successfully terminated pid {pid}"
