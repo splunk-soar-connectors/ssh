@@ -2,11 +2,11 @@
 # SSH
 
 Publisher: Splunk  
-Connector Version: 2\.3\.10  
+Connector Version: 2\.3\.11  
 Product Vendor: Generic  
 Product Name: SSH  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.1\.0  
 
 This app supports executing various endpoint\-based investigative and containment actions on an SSH endpoint
 
