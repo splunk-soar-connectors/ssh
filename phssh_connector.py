@@ -36,7 +36,7 @@ from phssh_consts import *
 
 try:
     from urllib.parse import unquote
-except:
+except Exception:
     from urllib import unquote
 
 os.sys.path.insert(0, "{}/paramikossh".format(os.path.dirname(os.path.abspath(__file__))))
@@ -62,7 +62,7 @@ class SshConnector(BaseConnector):
         try:
             if input_str is not None and (self._python_version == 2 or always_encode):
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
+        except Exception:
             self.debug_print(SSH_PY_2TO3_ERR_MSG)
 
         return input_str
@@ -83,14 +83,14 @@ class SshConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = SSH_ERR_CODE_UNAVAILABLE
                     error_msg = e.args[0]
-        except:
+        except Exception:
             pass
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = SSH_UNICODE_DAMMIT_TYPE_ERR_MSG
-        except:
+        except Exception:
             error_msg = SSH_ERR_MSG_UNAVAILABLE
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
@@ -112,7 +112,7 @@ class SshConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, SSH_VALID_INT_MSG.format(param=key)), None
 
                 parameter = int(parameter)
-            except:
+            except Exception:
                 return action_result.set_status(phantom.APP_ERROR, SSH_VALID_INT_MSG.format(param=key)), None
 
             if parameter < 0:
@@ -142,7 +142,7 @@ class SshConnector(BaseConnector):
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
-        except:
+        except Exception:
             return self.set_status(phantom.APP_ERROR, SSH_ERR_FETCHING_PYTHON_VERSION_MSG)
 
         return phantom.APP_SUCCESS
@@ -297,7 +297,7 @@ class SshConnector(BaseConnector):
                         self.debug_print("Password found at index: {}".format(index))
                     continue
                 lines.append(line)
-        except:
+        except Exception:
             return None
 
         return '\n'.join(lines)
@@ -325,7 +325,7 @@ class SshConnector(BaseConnector):
 
         try:
             endpoint = self.get_config()[SSH_JSON_DEVICE]
-        except:
+        except Exception:
             return action_result.set_status(phantom.APP_ERROR, SSH_HOSTNAME_OR_IP_NOT_SPECIFIED_ERR_MSG)
 
         status_code = self._start_connection(action_result, endpoint)
@@ -551,7 +551,7 @@ class SshConnector(BaseConnector):
 
             # result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
             action_result.set_status(phantom.APP_SUCCESS)
-        except:
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
@@ -709,7 +709,7 @@ class SshConnector(BaseConnector):
                     d["local_ip"] = ":".join(s)
                     if (la and d["local_ip"] != la):
                         continue
-                except:           # Some error parsing
+                except Exception:           # Some error parsing
                     d["local_port"] = ""
                     d["local_ip"] = ""
                 try:
@@ -721,7 +721,7 @@ class SshConnector(BaseConnector):
                     d["remote_ip"] = ":".join(s)
                     if (ra and d["remote_ip"] != ra):
                         continue
-                except:           # Some error parsing
+                except Exception:           # Some error parsing
                     d["remote_port"] = ""
                     d["remote_ip"] = ""
                 d["state"] = r[5]
@@ -736,7 +736,7 @@ class SshConnector(BaseConnector):
                         d["pid"] = s[0]
                         del s[0]
                         d["cmd"] = "/".join(s)
-                except:
+                except Exception:
                     d["pid"] = ""
                     d["cmd"] = ""
                 ll.append(d.copy())
@@ -744,7 +744,7 @@ class SshConnector(BaseConnector):
             action_result.add_data({"connections": ll})
 
             action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-        except:
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
@@ -830,14 +830,14 @@ class SshConnector(BaseConnector):
                     d['remote_ip'] = ""
                 try:
                     d['state'] = r[9][1:-1]  # Ignore paranthesis
-                except:
+                except Exception:
                     d['state'] = ""
                 ll.append(d.copy())
 
             action_result.add_data({"connections": ll})
 
             action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-        except:
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
@@ -920,7 +920,7 @@ class SshConnector(BaseConnector):
                         d["destination"] = row[5]
                         try:                    # the rest can contain port numbers, comments, and other things
                             the_rest = " ".join(row[6:])
-                        except:
+                        except Exception:
                             the_rest = ""
                         if (port and port not in the_rest):
                             i += 1
@@ -931,7 +931,7 @@ class SshConnector(BaseConnector):
 
             action_result.add_data({"rules": ll})
             action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-        except:
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
@@ -968,7 +968,7 @@ class SshConnector(BaseConnector):
             else:
                 remote_ip = "-d {}".format(param[SSH_JSON_REMOTE_IP])
             no_ip = False
-        except:
+        except Exception:
             remote_ip = ""
 
         try:
@@ -984,12 +984,12 @@ class SshConnector(BaseConnector):
             else:
                 port = "-dport {}".format(remote_port)
             no_port = False
-        except:
+        except Exception:
             port = ""
 
         try:
             comment = "-m comment --comment '{} -- Added by Phantom'".format(param[SSH_JSON_COMMENT])
-        except:
+        except Exception:
             comment = "-m comment --comment 'Added by Phantom'"
 
         if (no_ip and no_port):
@@ -1168,6 +1168,14 @@ class SshConnector(BaseConnector):
         action_result.update_summary(summary)
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _mb_to_gb(self, mb_val):
+        if mb_val[:-1].isalpha():
+            return mb_val
+        gb_val = float(mb_val) / 1024
+        if gb_val < 1:
+            return "{}M".format(mb_val)
+        return "{:.2f}G".format(gb_val)
+
     def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
         # ie for df -hP, this would be ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
@@ -1198,9 +1206,9 @@ class SshConnector(BaseConnector):
                         continue
                     else:
                         if new_header_names:
-                            temp[new_header_names[num]] = val
+                            temp[new_header_names[num]] = self._mb_to_gb(val)
                         else:
-                            temp[headers[num]] = val
+                            temp[headers[num]] = self._mb_to_gb(val)
             else:
                 for num in range(0, len(headers)):
                     linedata = line.strip().split()
@@ -1211,13 +1219,13 @@ class SshConnector(BaseConnector):
                         continue
                     if new_header_names:
                         try:
-                            temp[new_header_names[num]] = linedata[num]
-                        except:
+                            temp[new_header_names[num]] = self._mb_to_gb(linedata[num])
+                        except Exception:
                             temp[new_header_names[num]] = ''
                     else:
                         try:
-                            temp[headers[num]] = linedata[num]
-                        except:
+                            temp[headers[num]] = self._mb_to_gb(linedata[num])
+                        except Exception:
                             temp[headers[num]] = ''
             temp['raw'] = line
             results.append(temp)
@@ -1277,7 +1285,7 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
 
-        cmd = "free -h"
+        cmd = "free -m -l"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
