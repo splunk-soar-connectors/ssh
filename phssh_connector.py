@@ -392,7 +392,7 @@ class SshConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
         else:
             try:
-                cmd = param[SSH_JSON_CMD]
+                cmd = param.get(SSH_JSON_CMD)
             except Exception:
                 return action_result.set_status(phantom.APP_ERROR, SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_ERR_MSG)
 
@@ -964,15 +964,15 @@ class SshConnector(BaseConnector):
 
         try:
             if direction == "INPUT":
-                remote_ip = "-s {}".format(param[SSH_JSON_REMOTE_IP])
+                remote_ip = "-s {}".format(param.get(SSH_JSON_REMOTE_IP))
             else:
-                remote_ip = "-d {}".format(param[SSH_JSON_REMOTE_IP])
+                remote_ip = "-d {}".format(param.get(SSH_JSON_REMOTE_IP))
             no_ip = False
         except Exception:
             remote_ip = ""
 
         try:
-            remote_port = param[SSH_JSON_REMOTE_PORT]
+            remote_port = param.get(SSH_JSON_REMOTE_PORT)
 
             # integer validation of 'remote_port' action parameter
             ret_val, remote_port = self._validate_integer(action_result, remote_port, SSH_JSON_REMOTE_PORT, True)
@@ -988,7 +988,7 @@ class SshConnector(BaseConnector):
             port = ""
 
         try:
-            comment = "-m comment --comment '{} -- Added by Phantom'".format(param[SSH_JSON_COMMENT])
+            comment = "-m comment --comment '{} -- Added by Phantom'".format(param.get(SSH_JSON_COMMENT))
         except Exception:
             comment = "-m comment --comment 'Added by Phantom'"
 
@@ -1232,7 +1232,7 @@ class SshConnector(BaseConnector):
             results.append(temp)
         return results
 
-    def _handle_ssh_get_disk_usage(self, param):
+    def _handle_get_disk_usage(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1270,7 +1270,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _handle_ssh_get_memory_usage(self, param):
+    def _handle_get_memory_usage(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1350,9 +1350,9 @@ class SshConnector(BaseConnector):
         elif (action_id == ACTION_ID_GET_FILE):
             ret_val = self._handle_ssh_get_file(param)
         elif (action_id == ACTION_ID_GET_MEMORY_USAGE):
-            ret_val = self._handle_ssh_get_memory_usage(param)
+            ret_val = self._handle_get_memory_usage(param)
         elif (action_id == ACTION_ID_GET_DISK_USAGE):
-            ret_val = self._handle_ssh_get_disk_usage(param)
+            ret_val = self._handle_get_disk_usage(param)
         elif (action_id == ACTION_ID_PUT_FILE):
             ret_val = self._handle_ssh_put_file(param)
 
