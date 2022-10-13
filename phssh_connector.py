@@ -351,7 +351,7 @@ class SshConnector(BaseConnector):
         self.save_progress(SSH_SUCC_CONNECTIVITY_TEST)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _exec_command(self, param):
+    def _handle_ssh_execute_command(self, param):
 
         self.debug_print("Starting 'execute program' action function")
 
@@ -418,7 +418,7 @@ class SshConnector(BaseConnector):
         self.debug_print("'exec_command' action executed successfully")
         return action_result.get_status()
 
-    def _reboot_server(self, param):
+    def _handle_ssh_reboot_server(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -460,7 +460,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _shutdown_server(self, param):
+    def _handle_ssh_shutdown_server(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -499,7 +499,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _list_processes(self, param):
+    def _handle_ssh_list_processes(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -556,7 +556,7 @@ class SshConnector(BaseConnector):
 
         return action_result
 
-    def _kill_process(self, param):
+    def _handle_ssh_kill_process(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -591,7 +591,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _logout_user(self, param):
+    def _handle_ssh_logout_user(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -621,7 +621,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _list_connections(self, param):
+    def _handle_ssh_list_conn(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -842,7 +842,7 @@ class SshConnector(BaseConnector):
 
         return action_result
 
-    def _list_fw_rules(self, param):
+    def _handle_ssh_list_fw_rules(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -936,7 +936,7 @@ class SshConnector(BaseConnector):
 
         return action_result
 
-    def _block_ip(self, param):
+    def _handle_ssh_block_ip(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1014,7 +1014,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _delete_fw_rule(self, param):
+    def _handle_ssh_delete_fw_rule(self, param):
         """ Should this be changed to only delete rules
              created by Phantom?
         """
@@ -1076,7 +1076,7 @@ class SshConnector(BaseConnector):
 
         return action_result
 
-    def _get_file(self, param):
+    def _handle_ssh_get_file(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1115,7 +1115,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _put_file(self, param):
+    def _handle_ssh_put_file(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1169,12 +1169,13 @@ class SshConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _mb_to_gb(self, mb_val):
-        if mb_val[:-1].isalpha():
+        if mb_val.isnumeric():
+            gb_val = float(mb_val) / 1024
+            if gb_val < 1:
+                return "{}M".format(mb_val)
+            return "{:.2f}G".format(gb_val)
+        else:
             return mb_val
-        gb_val = float(mb_val) / 1024
-        if gb_val < 1:
-            return "{}M".format(mb_val)
-        return "{:.2f}G".format(gb_val)
 
     def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
@@ -1231,7 +1232,7 @@ class SshConnector(BaseConnector):
             results.append(temp)
         return results
 
-    def _get_disk_usage(self, param):
+    def _handle_ssh_get_disk_usage(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1269,7 +1270,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _get_memory_usage(self, param):
+    def _handle_ssh_get_memory_usage(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1327,33 +1328,33 @@ class SshConnector(BaseConnector):
         if (action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
             ret_val = self._test_connectivity(param)
         elif (action_id == ACTION_ID_EXEC_COMMAND):
-            ret_val = self._exec_command(param)
+            ret_val = self._handle_ssh_execute_command(param)
         elif (action_id == ACTION_ID_REBOOT_SERVER):
-            ret_val = self._reboot_server(param)
+            ret_val = self._handle_ssh_reboot_server(param)
         elif (action_id == ACTION_ID_SHUTDOWN_SERVER):
-            ret_val = self._shutdown_server(param)
+            ret_val = self._handle_ssh_shutdown_server(param)
         elif (action_id == ACTION_ID_LIST_PROCESSES):
-            ret_val = self._list_processes(param)
+            ret_val = self._handle_ssh_list_processes(param)
         elif (action_id == ACTION_ID_TERMINATE_PROCESS):
-            ret_val = self._kill_process(param)
+            ret_val = self._handle_ssh_kill_process(param)
         elif (action_id == ACTION_ID_LOGOUT_USER):
-            ret_val = self._logout_user(param)
+            ret_val = self._handle_ssh_logout_user(param)
         elif (action_id == ACTION_ID_LIST_CONN):
-            ret_val = self._list_connections(param)
+            ret_val = self._handle_ssh_list_conn(param)
         elif (action_id == ACTION_ID_LIST_FW_RULES):
-            ret_val = self._list_fw_rules(param)
+            ret_val = self._handle_ssh_list_fw_rules(param)
         elif (action_id == ACTION_ID_BLOCK_IP):
-            ret_val = self._block_ip(param)
+            ret_val = self._handle_ssh_block_ip(param)
         elif (action_id == ACTION_ID_DELETE_FW_RULE):
-            ret_val = self._delete_fw_rule(param)
+            ret_val = self._handle_ssh_delete_fw_rule(param)
         elif (action_id == ACTION_ID_GET_FILE):
-            ret_val = self._get_file(param)
+            ret_val = self._handle_ssh_get_file(param)
         elif (action_id == ACTION_ID_GET_MEMORY_USAGE):
-            ret_val = self._get_memory_usage(param)
+            ret_val = self._handle_ssh_get_memory_usage(param)
         elif (action_id == ACTION_ID_GET_DISK_USAGE):
-            ret_val = self._get_disk_usage(param)
+            ret_val = self._handle_ssh_get_disk_usage(param)
         elif (action_id == ACTION_ID_PUT_FILE):
-            ret_val = self._put_file(param)
+            ret_val = self._handle_ssh_put_file(param)
 
         return ret_val
 
