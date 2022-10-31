@@ -65,6 +65,7 @@ SSH_JSON_TIMEOUT = "timeout"
 SSH_JSON_PSEUDO_TERMINAL = "pseudo_terminal"
 SSH_JSON_VAULT_ID = 'vault_id'
 SSH_JSON_FILE_DEST = 'file_destination'
+SSH_JSON_DISABLE_SHA2 = 'disable_sha2'
 
 SSH_ERR_CONNECTION_FAILED = "Could not establish SSH connection to server"
 SSH_CONNECTION_ESTABLISHED = "Established SSH connection to server"

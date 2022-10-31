@@ -132,7 +132,7 @@ class SshConnector(BaseConnector):
         self._root = config.get(SSH_JSON_ROOT, False)
         self._rsa_key_file = config.get(SSH_JSON_RSA_KEY)
         self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
-
+        self._disable_sha2 = config.get(SSH_JSON_DISABLE_SHA2, False)
         # integer validation for 'timeout' config parameter
         timeout = config.get(SSH_JSON_TIMEOUT)
         ret_val, self._timeout = self._validate_integer(self, timeout, SSH_JSON_TIMEOUT)
@@ -180,9 +180,15 @@ class SshConnector(BaseConnector):
 
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, server)
         try:
-            self._ssh_client.connect(hostname=self._handle_py_ver_compat_for_input_str(server, True), username=self._username, pkey=key,
-                    password=self._password, allow_agent=False, look_for_keys=True,
-                    timeout=FIRST_RECV_TIMEOUT)
+            if self._disable_sha2:
+                self.debug_print("Disabling SHA2 algorithms")
+                self._ssh_client.connect(hostname=self._handle_py_ver_compat_for_input_str(server, True), username=self._username, pkey=key,
+                        password=self._password, allow_agent=False, look_for_keys=True,
+                        timeout=FIRST_RECV_TIMEOUT, disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]))
+            else:
+                self._ssh_client.connect(hostname=self._handle_py_ver_compat_for_input_str(server, True), username=self._username, pkey=key,
+                        password=self._password, allow_agent=False, look_for_keys=True,
+                        timeout=FIRST_RECV_TIMEOUT)
         except AuthenticationException:
             return action_result.set_status(phantom.APP_ERROR, SSH_AUTHENTICATION_FAILED_ERR_MSG)
         except BadHostKeyException as e:

@@ -66,5 +66,8 @@ Using the <code>chown</code> command:<br>
 The RSA key should be ready to use in the SSH asset. Based on the above example, configure this by specifying 'id_rsa' as the RSA key file. In the case of a different user, the absolute path to the key must be specified. For example, if keys are added using username <b>testuser</b> having the home directory <b>/home/testuser</b> then <b>/home/testuser/.ssh/id_rsa</b> should be specified as the RSA key file.
 </p>
 
+<h2>Disable SHA2 Algorithms Parameter</h2>
+<p>The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does not have the support of either RSA2 or the "server-sig-algs" protocol extension.</p>
+
 <h2>Verify Last Reboot Time</h2>
 <p>After successfully logging into your SSH server, run the command <code>last reboot</code> which will display all the previous reboot dates and times for the system.</p>
