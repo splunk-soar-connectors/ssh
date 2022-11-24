@@ -131,6 +131,10 @@ class SshConnector(BaseConnector):
         self._password = config.get(SSH_JSON_PASSWORD)
         self._root = config.get(SSH_JSON_ROOT, False)
         self._rsa_key_file = config.get(SSH_JSON_RSA_KEY)
+
+        if self._rsa_key_file[0] != '/':
+            self._rsa_key_file = "/{}".format(self._rsa_key_file)
+
         self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
         self._disable_sha2 = config.get(SSH_JSON_DISABLE_SHA2, False)
         # integer validation for 'timeout' config parameter
