@@ -5,7 +5,7 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
-    "app_version": "2.3.12",
+    "app_version": "2.4.0",
     "utctime_updated": "2022-02-02T07:05:42.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
@@ -13,7 +13,7 @@
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.3.4",
+    "min_phantom_version": "5.3.5",
     "fips_compliant": true,
     "python_version": "3",
     "latest_tested_versions": [
@@ -30,8 +30,7 @@
         "root": {
             "data_type": "boolean",
             "order": 1,
-            "description": "User is root",
-            "default": false
+            "description": "User is root"
         },
         "password": {
             "data_type": "password",
@@ -57,14 +56,12 @@
         "pseudo_terminal": {
             "data_type": "boolean",
             "order": 6,
-            "description": "Enable pseudo-terminal when running sudo commands",
-            "default": false
+            "description": "Enable pseudo-terminal when running sudo commands"
         },
         "disable_sha2": {
             "data_type": "boolean",
             "order": 7,
-            "description": "Disable SHA2 Algorithms (For Older SSH instances)",
-            "default": false
+            "description": "Disable SHA2 Algorithms (For Older SSH instances)"
         }
     },
     "actions": [
@@ -2126,7 +2123,7 @@
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-38.0.3-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "paramiko",
@@ -2166,7 +2163,7 @@
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-38.0.3-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "paramiko",
