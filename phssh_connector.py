@@ -150,7 +150,7 @@ class SshConnector(BaseConnector):
 
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_CONNECTIVITY__FAILED_ERR, err))
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_CONNECTIVITY_FAILED_ERR, err))
         else:
             key = None
 
@@ -236,7 +236,7 @@ class SshConnector(BaseConnector):
                     err = 'Error: Timeout after {} seconds'.format(timeout)
                     return action_result.set_status(phantom.APP_ERROR, err), output, 1
                 elif (self._shell_channel.recv_ready()):
-                    output += self._shell_channel.recv(8192)
+                    output += self._shell_channel.recv(8192).decode('utf-8')
                     # This is pretty messy but it's just the way it is I guess
                     if (sendpw and passwd):
                         try:

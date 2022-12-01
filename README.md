@@ -52,7 +52,7 @@ used with servers where pseudo-terminals are not supported.
 
 ## Key-based authentication
 
-Refer to the following steps to install the authentication keys. Note that the key pair must be
+Refer to the following steps to install the authentication keys in on-prem instance. Note that the key pair must be
 unencrypted and generated using `     ssh-keygen    ` .
 
 **Note:** The screenshots attached below are for Non-NRI instances having **/home/phantom-worker**
