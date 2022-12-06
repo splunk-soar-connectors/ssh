@@ -25,7 +25,6 @@ import paramiko
 import phantom.app as phantom
 import phantom.rules as ph_rules
 import simplejson as json
-from bs4 import UnicodeDammit
 from paramiko.ssh_exception import AuthenticationException, BadHostKeyException
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
@@ -36,7 +35,7 @@ from phssh_consts import *
 
 try:
     from urllib.parse import unquote
-except:
+except Exception:
     from urllib import unquote
 
 os.sys.path.insert(0, "{}/paramikossh".format(os.path.dirname(os.path.abspath(__file__))))
@@ -51,29 +50,15 @@ class SshConnector(BaseConnector):
         self._shell_channel = None
         self.OS_TYPE = OS_LINUX
 
-    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param input_str: Input string to be processed
-        :param always_encode: Used if the string needs to be encoded for python 3
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str is not None and (self._python_version == 2 or always_encode):
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print(SSH_PY_2TO3_ERR_MSG)
-
-        return input_str
-
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
-        error_code = SSH_ERR_CODE_UNAVAILABLE
-        error_msg = SSH_ERR_MSG_UNAVAILABLE
+        error_code = SSH_CODE_UNAVAILABLE_ERR
+        error_msg = SSH_MSG_UNAVAILABLE_ERR
+
+        self.error_print(error_msg, dump_object=e)
 
         try:
             if e.args:
@@ -81,17 +66,10 @@ class SshConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = SSH_ERR_CODE_UNAVAILABLE
+                    error_code = SSH_CODE_UNAVAILABLE_ERR
                     error_msg = e.args[0]
-        except:
+        except Exception:
             pass
-
-        try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = SSH_UNICODE_DAMMIT_TYPE_ERR_MSG
-        except:
-            error_msg = SSH_ERR_MSG_UNAVAILABLE
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -112,7 +90,7 @@ class SshConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, SSH_VALID_INT_MSG.format(param=key)), None
 
                 parameter = int(parameter)
-            except:
+            except Exception:
                 return action_result.set_status(phantom.APP_ERROR, SSH_VALID_INT_MSG.format(param=key)), None
 
             if parameter < 0:
@@ -131,8 +109,9 @@ class SshConnector(BaseConnector):
         self._password = config.get(SSH_JSON_PASSWORD)
         self._root = config.get(SSH_JSON_ROOT, False)
         self._rsa_key_file = config.get(SSH_JSON_RSA_KEY)
-        self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
 
+        self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
+        self._disable_sha2 = config.get(SSH_JSON_DISABLE_SHA2, False)
         # integer validation for 'timeout' config parameter
         timeout = config.get(SSH_JSON_TIMEOUT)
         ret_val, self._timeout = self._validate_integer(self, timeout, SSH_JSON_TIMEOUT)
@@ -142,8 +121,8 @@ class SshConnector(BaseConnector):
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, SSH_ERR_FETCHING_PYTHON_VERSION_MSG)
+        except Exception:
+            return self.set_status(phantom.APP_ERROR, SSH_FETCHING_PYTHON_VERSION_MSG_ERR)
 
         return phantom.APP_SUCCESS
 
@@ -152,7 +131,7 @@ class SshConnector(BaseConnector):
         self.debug_print("PARAMIKO VERSION. {}".format(paramiko.__version__))
 
         if self._rsa_key_file is None and self._password is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_PWD_OR_RSA_KEY_NOT_SPECIFIED_ERR_MSG)
+            return action_result.set_status(phantom.APP_ERROR, SSH_PWD_OR_RSA_KEY_NOT_SPECIFIED_MSG_ERR)
 
         if self._rsa_key_file:
             try:
@@ -171,7 +150,7 @@ class SshConnector(BaseConnector):
 
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_ERR_CONNECTION_FAILED, err))
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_CONNECTIVITY_FAILED_ERR, err))
         else:
             key = None
 
@@ -180,21 +159,27 @@ class SshConnector(BaseConnector):
 
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, server)
         try:
-            self._ssh_client.connect(hostname=self._handle_py_ver_compat_for_input_str(server, True), username=self._username, pkey=key,
-                    password=self._password, allow_agent=False, look_for_keys=True,
-                    timeout=FIRST_RECV_TIMEOUT)
+            if self._disable_sha2:
+                self.debug_print("Disabling SHA2 algorithms")
+                self._ssh_client.connect(hostname=server, username=self._username, pkey=key,
+                        password=self._password, allow_agent=False, look_for_keys=True,
+                        timeout=FIRST_RECV_TIMEOUT, disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]))
+            else:
+                self._ssh_client.connect(hostname=server, username=self._username, pkey=key,
+                        password=self._password, allow_agent=False, look_for_keys=True,
+                        timeout=FIRST_RECV_TIMEOUT)
         except AuthenticationException:
-            return action_result.set_status(phantom.APP_ERROR, SSH_AUTHENTICATION_FAILED_ERR_MSG)
+            return action_result.set_status(phantom.APP_ERROR, SSH_AUTHENTICATION_FAILED_MSG_ERR)
         except BadHostKeyException as e:
             err = self._get_error_message_from_exception(e)
-            error_msg = "{}. {}".format(SSH_BAD_HOST_KEY_ERR_MSG, err)
+            error_msg = "{}. {}".format(SSH_BAD_HOST_KEY_MSG_ERR, err)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
         except SocketError:
-            error_msg = "{}. {}".format(SSH_ERR_CONNECTION_FAILED, SSH_FAILED_TO_RESOLVE_ERR_MSG.format(server=server))
+            error_msg = "{}. {}".format(SSH_CONNECTIVITY_FAILED_ERR, SSH_FAILED_TO_RESOLVE_MSG_ERR.format(server=server))
             return action_result.set_status(phantom.APP_ERROR, error_msg)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_ERR_CONNECTION_FAILED, err))
+            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_CONNECTIVITY_FAILED_ERR, err))
 
         return phantom.APP_SUCCESS
 
@@ -232,14 +217,14 @@ class SshConnector(BaseConnector):
                 return action_result.get_status(), output, exit_status
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_ERR_SHELL_SEND_COMMAND.format(command), err)), None, None
+            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_SHELL_SEND_COMMAND_ERR.format(command), err)), None, None
 
         self.debug_print("Command executed successfully")
-        return action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_EXEC), output, exit_status
+        return action_result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_EXEC), output, exit_status
 
     def _get_output(self, action_result, timeout, passwd, suppress):
         sendpw = True
-        output = self._handle_py_ver_compat_for_input_str("", True)
+        output = ""
         i = 1
         stime = int(time.time())
         if not suppress:
@@ -249,19 +234,15 @@ class SshConnector(BaseConnector):
                 ctime = int(time.time())
                 if (timeout and ctime - stime >= timeout):
                     err = 'Error: Timeout after {} seconds'.format(timeout)
-                    try:
-                        output = self._handle_py_ver_compat_for_input_str(output, True).decode("utf-8")
-                    except Exception:
-                        return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(err, SSH_DECODE_OUTPUT_ERR_MSG)), "", 1
                     return action_result.set_status(phantom.APP_ERROR, err), output, 1
                 elif (self._shell_channel.recv_ready()):
-                    output += self._shell_channel.recv(8192)
+                    output += self._shell_channel.recv(8192).decode('utf-8')
                     # This is pretty messy but it's just the way it is I guess
                     if (sendpw and passwd):
                         try:
                             self._shell_channel.send("{}\n".format(passwd))
                             if not self._pseudo_terminal:
-                                output += self._handle_py_ver_compat_for_input_str("\n", True)
+                                output += "\n"
                         except socket.error:
                             pass
                         sendpw = False
@@ -276,11 +257,6 @@ class SshConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err), "", None
-
-        try:
-            output = self._handle_py_ver_compat_for_input_str(output, True).decode("utf-8")
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, SSH_DECODE_OUTPUT_ERR_MSG), "", 1
 
         return action_result.set_status(phantom.APP_SUCCESS), output, self._shell_channel.recv_exit_status()
 
@@ -297,7 +273,7 @@ class SshConnector(BaseConnector):
                         self.debug_print("Password found at index: {}".format(index))
                     continue
                 lines.append(line)
-        except:
+        except Exception:
             return None
 
         return '\n'.join(lines)
@@ -309,7 +285,7 @@ class SshConnector(BaseConnector):
             action_result.set_status(phantom.APP_ERROR, output_on_err)
             d = {"output": output_on_err}
         else:
-            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
+            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_SUCCESS)
             d = {"output": output_on_succ}
 
         action_result.add_data(d)
@@ -325,14 +301,14 @@ class SshConnector(BaseConnector):
 
         try:
             endpoint = self.get_config()[SSH_JSON_DEVICE]
-        except:
-            return action_result.set_status(phantom.APP_ERROR, SSH_HOSTNAME_OR_IP_NOT_SPECIFIED_ERR_MSG)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, SSH_HOSTNAME_OR_IP_NOT_SPECIFIED_MSG_ERR)
 
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
-            self.save_progress(SSH_ERR_CONNECTIVITY_TEST)
+            self.save_progress(SSH_CONNECTIVITY_TEST_ERR)
             return action_result.get_status()
-        self.save_progress(SSH_CONNECTION_ESTABLISHED)
+        self.save_progress(SSH_CONNECTIVITY_ESTABLISHED)
         self.save_progress("Executing 'uname' command...")
 
         # Get Linux Distribution
@@ -348,10 +324,10 @@ class SshConnector(BaseConnector):
             self.OS_TYPE = OS_MAC
         self.debug_print("ssh uname {}".format(stdout))
 
-        self.save_progress(SSH_SUCC_CONNECTIVITY_TEST)
+        self.save_progress(SSH_SUCCESS_CONNECTIVITY_TEST)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _exec_command(self, param):
+    def _handle_ssh_execute_command(self, param):
 
         self.debug_print("Starting 'execute program' action function")
 
@@ -364,7 +340,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         # As it turns out, even if the data type is "numeric" in the json
         # the data will end up being a string after you receive it
@@ -388,19 +364,19 @@ class SshConnector(BaseConnector):
                     cmd = f.read()
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                err_msg = "{}. {}".format(SSH_UNABLE_TO_READ_SCRIPT_FILE_ERR_MSG.format(script_file=script_file), err)
+                err_msg = "{}. {}".format(SSH_UNABLE_TO_READ_SCRIPT_FILE_MSG_ERR.format(script_file=script_file), err)
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
         else:
             try:
-                cmd = param[SSH_JSON_CMD]
+                cmd = param.get(SSH_JSON_CMD)
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_ERR_MSG)
+                return action_result.set_status(phantom.APP_ERROR, SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_MSG_ERR)
 
         # Command needs to be run as root
         if (not self._root and cmd.split()[0] == "sudo"):
             passwd = self._password
             if passwd is None:
-                return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+                return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         else:
             passwd = ""
 
@@ -418,7 +394,7 @@ class SshConnector(BaseConnector):
         self.debug_print("'exec_command' action executed successfully")
         return action_result.get_status()
 
-    def _reboot_server(self, param):
+    def _handle_ssh_reboot_server(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -427,7 +403,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         cmd = "sudo -S shutdown -r now"
         passwd = self._password
@@ -435,7 +411,7 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -452,15 +428,15 @@ class SshConnector(BaseConnector):
             action_result.set_status(phantom.APP_ERROR, stdout)
             d = {"output": stdout}
         else:
-            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-            d = {"output": SSH_SHELL_NO_ERRORS}
+            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_SUCCESS)
+            d = {"output": SSH_SHELL_NO_ERR}
 
         action_result.add_data(d)
         action_result.update_summary({"exit_status": exit_status})
 
         return action_result.get_status()
 
-    def _shutdown_server(self, param):
+    def _handle_ssh_shutdown_server(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -469,7 +445,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         cmd = "sudo -S shutdown -h now"
         passwd = self._password
@@ -477,7 +453,7 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -489,17 +465,17 @@ class SshConnector(BaseConnector):
         time.sleep(15)
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
-            d = {"output": SSH_SHELL_NO_ERRORS}
+            d = {"output": SSH_SHELL_NO_ERR}
             action_result.add_data(d)
             action_result.update_summary({"exit_status": exit_status})
-            return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(SSH_ENDPOINT_SHUTDOWN_MSG, SSH_SUCC_CMD_SUCCESS))
+            return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(SSH_ENDPOINT_SHUTDOWN_MSG, SSH_SUCCESS_CMD_SUCCESS))
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                stdout, SSH_SHELL_NO_ERRORS)
+                stdout, SSH_SHELL_NO_ERR)
 
         return action_result.get_status()
 
-    def _list_processes(self, param):
+    def _handle_ssh_list_processes(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -508,7 +484,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         # excl_root = param.get(SSH_JSON_EXCL_ROOT, False)
 
@@ -549,14 +525,14 @@ class SshConnector(BaseConnector):
             action_result.add_data({"processes": ll})
             action_result.update_summary({"total_processes": len(ll)})
 
-            # result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
+            # result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_SUCCESS)
             action_result.set_status(phantom.APP_SUCCESS)
-        except:
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
 
-    def _kill_process(self, param):
+    def _handle_ssh_kill_process(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -565,7 +541,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         pid = param[SSH_JSON_PID]
 
@@ -578,7 +554,7 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         cmd = "sudo -S kill -SIGKILL {}".format(pid)
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
@@ -591,7 +567,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _logout_user(self, param):
+    def _handle_ssh_logout_user(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -600,7 +576,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         user_name = param[SSH_JSON_USER]
         passwd = self._password
@@ -608,7 +584,7 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         cmd = "sudo -S pkill -SIGKILL -u {}".format(user_name)
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
@@ -621,7 +597,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _list_connections(self, param):
+    def _handle_ssh_list_conn(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -630,12 +606,12 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         passwd = self._password
         root = self._root
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         local_addr = param.get(SSH_JSON_LOCAL_ADDR, "")
         local_port = param.get(SSH_JSON_LOCAL_PORT, "")
 
@@ -674,9 +650,9 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_NO_SHELL_OUTPUT_ERR_MSG, SSH_IS_NETSTAT_INSTALLED_MSG))
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_NO_SHELL_OUTPUT_MSG_ERR, SSH_IS_NETSTAT_INSTALLED_MSG))
             return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(
-                SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout), SSH_IS_NETSTAT_INSTALLED_MSG))
+                SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout), SSH_IS_NETSTAT_INSTALLED_MSG))
 
         action_result = self._parse_connections(action_result, stdout, cmd,
                             local_addr, local_port, remote_addr, remote_port)
@@ -709,7 +685,7 @@ class SshConnector(BaseConnector):
                     d["local_ip"] = ":".join(s)
                     if (la and d["local_ip"] != la):
                         continue
-                except:           # Some error parsing
+                except Exception:           # Some error parsing
                     d["local_port"] = ""
                     d["local_ip"] = ""
                 try:
@@ -721,7 +697,7 @@ class SshConnector(BaseConnector):
                     d["remote_ip"] = ":".join(s)
                     if (ra and d["remote_ip"] != ra):
                         continue
-                except:           # Some error parsing
+                except Exception:           # Some error parsing
                     d["remote_port"] = ""
                     d["remote_ip"] = ""
                 d["state"] = r[5]
@@ -736,15 +712,15 @@ class SshConnector(BaseConnector):
                         d["pid"] = s[0]
                         del s[0]
                         d["cmd"] = "/".join(s)
-                except:
+                except Exception:
                     d["pid"] = ""
                     d["cmd"] = ""
                 ll.append(d.copy())
 
             action_result.add_data({"connections": ll})
 
-            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-        except:
+            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_SUCCESS)
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
@@ -763,8 +739,8 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout))
+                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         action_result = self._parse_connections_mac(action_result, stdout, cmd,
                             local_addr, local_port, remote_addr, remote_port)
@@ -830,19 +806,19 @@ class SshConnector(BaseConnector):
                     d['remote_ip'] = ""
                 try:
                     d['state'] = r[9][1:-1]  # Ignore paranthesis
-                except:
+                except Exception:
                     d['state'] = ""
                 ll.append(d.copy())
 
             action_result.add_data({"connections": ll})
 
-            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-        except:
+            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_SUCCESS)
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
 
-    def _list_fw_rules(self, param):
+    def _handle_ssh_list_fw_rules(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -851,17 +827,17 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         if (self.OS_TYPE == OS_MAC):
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
+            return action_result.set_status(phantom.APP_ERROR, SSH_FIREWALL_CMDS_NOT_SUPPORTED_ERR)
 
         passwd = self._password
         root = self._root
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         prot = param.get(SSH_JSON_PROTOCOL, "")
         port = param.get(SSH_JSON_PORT, "")
 
@@ -884,8 +860,8 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout))
+                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         action_result = self._filter_fw_rules(action_result, stdout, cmd, prot, port)
 
@@ -920,7 +896,7 @@ class SshConnector(BaseConnector):
                         d["destination"] = row[5]
                         try:                    # the rest can contain port numbers, comments, and other things
                             the_rest = " ".join(row[6:])
-                        except:
+                        except Exception:
                             the_rest = ""
                         if (port and port not in the_rest):
                             i += 1
@@ -930,13 +906,13 @@ class SshConnector(BaseConnector):
                     i += 1
 
             action_result.add_data({"rules": ll})
-            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCC_CMD_SUCCESS)
-        except:
+            action_result.set_status(phantom.APP_SUCCESS, SSH_SUCCESS_CMD_SUCCESS)
+        except Exception:
             action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_PARSE_OUTPUT_OF_CMD.format(cmd))
 
         return action_result
 
-    def _block_ip(self, param):
+    def _handle_ssh_block_ip(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -945,10 +921,10 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         if (self.OS_TYPE == OS_MAC):
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
+            return action_result.set_status(phantom.APP_ERROR, SSH_FIREWALL_CMDS_NOT_SUPPORTED_ERR)
 
         no_ip = True
         no_port = True
@@ -957,22 +933,22 @@ class SshConnector(BaseConnector):
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
 
         protocol = param[SSH_JSON_PROTOCOL]
         direction = "INPUT" if param[SSH_JSON_DIRECTION].lower() == "in" else "OUTPUT"
 
         try:
             if direction == "INPUT":
-                remote_ip = "-s {}".format(param[SSH_JSON_REMOTE_IP])
+                remote_ip = "-s {}".format(param.get(SSH_JSON_REMOTE_IP))
             else:
-                remote_ip = "-d {}".format(param[SSH_JSON_REMOTE_IP])
+                remote_ip = "-d {}".format(param.get(SSH_JSON_REMOTE_IP))
             no_ip = False
-        except:
+        except Exception:
             remote_ip = ""
 
         try:
-            remote_port = param[SSH_JSON_REMOTE_PORT]
+            remote_port = param.get(SSH_JSON_REMOTE_PORT)
 
             # integer validation of 'remote_port' action parameter
             ret_val, remote_port = self._validate_integer(action_result, remote_port, SSH_JSON_REMOTE_PORT, True)
@@ -984,16 +960,16 @@ class SshConnector(BaseConnector):
             else:
                 port = "-dport {}".format(remote_port)
             no_port = False
-        except:
+        except Exception:
             port = ""
 
         try:
-            comment = "-m comment --comment '{} -- Added by Phantom'".format(param[SSH_JSON_COMMENT])
-        except:
+            comment = "-m comment --comment '{} -- Added by Phantom'".format(param.get(SSH_JSON_COMMENT))
+        except Exception:
             comment = "-m comment --comment 'Added by Phantom'"
 
         if (no_ip and no_port):
-            return action_result.set_status(phantom.APP_ERROR, SSH_REMOTE_IP_OR_PORT_NOT_SPECIFIED_ERR_MSG)
+            return action_result.set_status(phantom.APP_ERROR, SSH_REMOTE_IP_OR_PORT_NOT_SPECIFIED_MSG_ERR)
 
         cmd = "sudo -S iptables -I {} -p {} {} {} -j DROP {}".format(direction,
                                                                       protocol, remote_ip,
@@ -1007,14 +983,14 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout))
+                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         action_result = self._save_iptables(action_result, passwd)
 
         return action_result.get_status()
 
-    def _delete_fw_rule(self, param):
+    def _handle_ssh_delete_fw_rule(self, param):
         """ Should this be changed to only delete rules
              created by Phantom?
         """
@@ -1025,17 +1001,17 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         if (self.OS_TYPE == OS_MAC):
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_FIREWALL_CMDS_NOT_SUPPORTED)
+            return action_result.set_status(phantom.APP_ERROR, SSH_FIREWALL_CMDS_NOT_SUPPORTED_ERR)
 
         passwd = self._password
         root = self._root
         if root:
             passwd = None
         if not root and passwd is None:
-            return action_result.set_status(phantom.APP_ERROR, SSH_ERR_NEED_PW_FOR_ROOT)
+            return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         chain = param[SSH_JSON_CHAIN]
         number = param[SSH_JSON_NUMBER]
 
@@ -1054,8 +1030,8 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout))
+                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         action_result = self._save_iptables(action_result, passwd)
 
@@ -1072,11 +1048,11 @@ class SshConnector(BaseConnector):
             return action_result
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                "{} Is the iptables service running?".format(stdout), SSH_SHELL_NO_ERRORS)
+                "{} Is the iptables service running?".format(stdout), SSH_SHELL_NO_ERR)
 
         return action_result
 
-    def _get_file(self, param):
+    def _handle_ssh_get_file(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1085,7 +1061,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         file_path = param[SSH_JSON_FILE_PATH]
         # /some/dir/file_name
@@ -1101,7 +1077,7 @@ class SshConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             sftp.close()
-            return action_result.set_status(phantom.APP_ERROR, SSH_GET_FILE_ERR_MSG.format(err=err))
+            return action_result.set_status(phantom.APP_ERROR, SSH_GET_FILE_MSG_ERR.format(err=err))
 
         sftp.close()
         vault_ret = Vault.add_attachment(vault_path, self.get_container_id(), file_name=file_name)
@@ -1115,7 +1091,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _put_file(self, param):
+    def _handle_ssh_put_file(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1124,7 +1100,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         # fetching phantom vault details
         try:
@@ -1132,10 +1108,10 @@ class SshConnector(BaseConnector):
             vault_meta_info = list(vault_meta_info)
             if not success or not vault_meta_info:
                 error_msg = " Error Details: {}".format(unquote(message)) if message else ''
-                return action_result.set_status(phantom.APP_ERROR, "{}.{}".format(SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_ERR_MSG, error_msg))
+                return action_result.set_status(phantom.APP_ERROR, "{}.{}".format(SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_MSG_ERR, error_msg))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_ERR_MSG, err))
+            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_MSG_ERR, err))
 
         # phantom vault file path
         file_path = vault_meta_info[0].get('path')
@@ -1146,7 +1122,7 @@ class SshConnector(BaseConnector):
 
         # Returning an error if the filename is included in the file_destination path
         if dest_file_name in file_dest:
-            return action_result.set_status(phantom.APP_ERROR, SSH_EXCLUDE_FILENAME_ERR_MSG)
+            return action_result.set_status(phantom.APP_ERROR, SSH_EXCLUDE_FILENAME_MSG_ERR)
 
         destination_path = "{}{}{}".format(param[SSH_JSON_FILE_DEST], '/' if param[SSH_JSON_FILE_DEST][-1] != '/' else '', dest_file_name)
 
@@ -1156,17 +1132,26 @@ class SshConnector(BaseConnector):
         except FileNotFoundError as e:
             err = self._get_error_message_from_exception(e)
             sftp.close()
-            err = "{}. {}".format(err, SSH_FILE_NOT_FOUND_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_ERR_MSG.format(err=err))
+            err = "{}. {}".format(err, SSH_FILE_NOT_FOUND_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_MSG_ERR.format(err=err))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             sftp.close()
-            return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_ERR_MSG.format(err=err))
+            return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_MSG_ERR.format(err=err))
         sftp.close()
 
         summary = {'file_sent': destination_path }
         action_result.update_summary(summary)
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _mb_to_gb(self, mb_val):
+        if mb_val.isnumeric():
+            gb_val = float(mb_val) / 1024
+            if gb_val < 1:
+                return "{}M".format(mb_val)
+            return "{:.2f}G".format(gb_val)
+        else:
+            return mb_val
 
     def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
@@ -1198,9 +1183,9 @@ class SshConnector(BaseConnector):
                         continue
                     else:
                         if new_header_names:
-                            temp[new_header_names[num]] = val
+                            temp[new_header_names[num]] = self._mb_to_gb(val)
                         else:
-                            temp[headers[num]] = val
+                            temp[headers[num]] = self._mb_to_gb(val)
             else:
                 for num in range(0, len(headers)):
                     linedata = line.strip().split()
@@ -1211,19 +1196,19 @@ class SshConnector(BaseConnector):
                         continue
                     if new_header_names:
                         try:
-                            temp[new_header_names[num]] = linedata[num]
-                        except:
+                            temp[new_header_names[num]] = self._mb_to_gb(linedata[num])
+                        except Exception:
                             temp[new_header_names[num]] = ''
                     else:
                         try:
-                            temp[headers[num]] = linedata[num]
-                        except:
+                            temp[headers[num]] = self._mb_to_gb(linedata[num])
+                        except Exception:
                             temp[headers[num]] = ''
             temp['raw'] = line
             results.append(temp)
         return results
 
-    def _get_disk_usage(self, param):
+    def _handle_get_disk_usage(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1232,7 +1217,7 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         passwd = self._password
         root = self._root
@@ -1249,8 +1234,8 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout))
+                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         stdout2 = stdout.replace("%", "")  # clean up % from text
         result = self._parse_generic(data=stdout2,
@@ -1261,7 +1246,7 @@ class SshConnector(BaseConnector):
 
         return action_result.get_status()
 
-    def _get_memory_usage(self, param):
+    def _handle_get_memory_usage(self, param):
 
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1270,14 +1255,14 @@ class SshConnector(BaseConnector):
         status_code = self._start_connection(action_result, endpoint)
         if phantom.is_fail(status_code):
             return action_result.get_status()
-        self.debug_print(SSH_CONNECTION_ESTABLISHED)
+        self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         passwd = self._password
         root = self._root
         if root:
             passwd = None
 
-        cmd = "free -h"
+        cmd = "free -m -l"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -1287,8 +1272,8 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_ERR_MSG)
-            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_ERR_MSG.format(stdout=stdout))
+                return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
+            return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         result = self._parse_generic(data=stdout,
                        headers=['', 'total', 'used', 'free', 'shared', 'buff/cache', "available"],
@@ -1319,33 +1304,33 @@ class SshConnector(BaseConnector):
         if (action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
             ret_val = self._test_connectivity(param)
         elif (action_id == ACTION_ID_EXEC_COMMAND):
-            ret_val = self._exec_command(param)
+            ret_val = self._handle_ssh_execute_command(param)
         elif (action_id == ACTION_ID_REBOOT_SERVER):
-            ret_val = self._reboot_server(param)
+            ret_val = self._handle_ssh_reboot_server(param)
         elif (action_id == ACTION_ID_SHUTDOWN_SERVER):
-            ret_val = self._shutdown_server(param)
+            ret_val = self._handle_ssh_shutdown_server(param)
         elif (action_id == ACTION_ID_LIST_PROCESSES):
-            ret_val = self._list_processes(param)
+            ret_val = self._handle_ssh_list_processes(param)
         elif (action_id == ACTION_ID_TERMINATE_PROCESS):
-            ret_val = self._kill_process(param)
+            ret_val = self._handle_ssh_kill_process(param)
         elif (action_id == ACTION_ID_LOGOUT_USER):
-            ret_val = self._logout_user(param)
-        elif (action_id == ACTION_ID_LIST_CONN):
-            ret_val = self._list_connections(param)
+            ret_val = self._handle_ssh_logout_user(param)
+        elif (action_id == ACTION_ID_LIST_CONNECTIVITY):
+            ret_val = self._handle_ssh_list_conn(param)
         elif (action_id == ACTION_ID_LIST_FW_RULES):
-            ret_val = self._list_fw_rules(param)
+            ret_val = self._handle_ssh_list_fw_rules(param)
         elif (action_id == ACTION_ID_BLOCK_IP):
-            ret_val = self._block_ip(param)
+            ret_val = self._handle_ssh_block_ip(param)
         elif (action_id == ACTION_ID_DELETE_FW_RULE):
-            ret_val = self._delete_fw_rule(param)
+            ret_val = self._handle_ssh_delete_fw_rule(param)
         elif (action_id == ACTION_ID_GET_FILE):
-            ret_val = self._get_file(param)
+            ret_val = self._handle_ssh_get_file(param)
         elif (action_id == ACTION_ID_GET_MEMORY_USAGE):
-            ret_val = self._get_memory_usage(param)
+            ret_val = self._handle_get_memory_usage(param)
         elif (action_id == ACTION_ID_GET_DISK_USAGE):
-            ret_val = self._get_disk_usage(param)
+            ret_val = self._handle_get_disk_usage(param)
         elif (action_id == ACTION_ID_PUT_FILE):
-            ret_val = self._put_file(param)
+            ret_val = self._handle_ssh_put_file(param)
 
         return ret_val
 
