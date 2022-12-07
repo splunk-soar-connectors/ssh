@@ -938,13 +938,13 @@ class SshConnector(BaseConnector):
         direction = "INPUT" if param[SSH_JSON_DIRECTION].lower() == "in" else "OUTPUT"
 
         remote_ip = param.get(SSH_JSON_REMOTE_IP)
-        try:
+        if remote_ip:
             if direction == "INPUT":
-                remote_ip = "-s {}".format(param.get(SSH_JSON_REMOTE_IP))
+                remote_ip = "-s {}".format(remote_ip)
             else:
-                remote_ip = "-d {}".format(param.get(SSH_JSON_REMOTE_IP))
+                remote_ip = "-d {}".format(remote_ip)
             no_ip = False
-        except Exception:
+        else:
             remote_ip = ""
 
         remote_port = param.get(SSH_JSON_REMOTE_PORT)
@@ -963,9 +963,9 @@ class SshConnector(BaseConnector):
         else:
             port = ""
 
-        json_comment = param.get(SSH_JSON_COMMENT)
-        if json_comment:
-            comment = "-m comment --comment '{} -- Added by Phantom'".format(json_comment)
+        user_comment = param.get(SSH_JSON_COMMENT)
+        if user_comment:
+            comment = "-m comment --comment '{} -- Added by Phantom'".format(user_comment)
         else:
             comment = "-m comment --comment 'Added by Phantom'"
 
