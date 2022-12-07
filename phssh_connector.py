@@ -367,9 +367,8 @@ class SshConnector(BaseConnector):
                 err_msg = "{}. {}".format(SSH_UNABLE_TO_READ_SCRIPT_FILE_MSG_ERR.format(script_file=script_file), err)
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
         else:
-            try:
-                cmd = param.get(SSH_JSON_CMD)
-            except Exception:
+            cmd = param.get(SSH_JSON_CMD)
+            if not cmd:
                 return action_result.set_status(phantom.APP_ERROR, SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_MSG_ERR)
 
         # Command needs to be run as root
@@ -938,6 +937,7 @@ class SshConnector(BaseConnector):
         protocol = param[SSH_JSON_PROTOCOL]
         direction = "INPUT" if param[SSH_JSON_DIRECTION].lower() == "in" else "OUTPUT"
 
+        remote_ip = param.get(SSH_JSON_REMOTE_IP)
         try:
             if direction == "INPUT":
                 remote_ip = "-s {}".format(param.get(SSH_JSON_REMOTE_IP))
@@ -947,25 +947,26 @@ class SshConnector(BaseConnector):
         except Exception:
             remote_ip = ""
 
-        try:
-            remote_port = param.get(SSH_JSON_REMOTE_PORT)
+        remote_port = param.get(SSH_JSON_REMOTE_PORT)
 
-            # integer validation of 'remote_port' action parameter
-            ret_val, remote_port = self._validate_integer(action_result, remote_port, SSH_JSON_REMOTE_PORT, True)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
+        # integer validation of 'remote_port' action parameter
+        ret_val, remote_port = self._validate_integer(action_result, remote_port, SSH_JSON_REMOTE_PORT, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
+        if remote_port:
             if direction == "INPUT":
                 port = "--destination-port {}".format(remote_port)
             else:
                 port = "-dport {}".format(remote_port)
             no_port = False
-        except Exception:
+        else:
             port = ""
 
-        try:
-            comment = "-m comment --comment '{} -- Added by Phantom'".format(param.get(SSH_JSON_COMMENT))
-        except Exception:
+        json_comment = param.get(SSH_JSON_COMMENT)
+        if json_comment:
+            comment = "-m comment --comment '{} -- Added by Phantom'".format(json_comment)
+        else:
             comment = "-m comment --comment 'Added by Phantom'"
 
         if (no_ip and no_port):
