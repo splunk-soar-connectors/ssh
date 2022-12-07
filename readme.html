@@ -28,7 +28,7 @@ If you are logging in as the root user (or a user otherwise configured to not ne
 
 <h2>Key-based authentication</h2>
 <p>
-Refer to the following steps to install the authentication keys. Note that the key pair must be unencrypted and generated using <code>ssh-keygen</code>.
+Refer to the following steps to install the authentication keys in on-prem instance. Note that the key pair must be unencrypted and generated using <code>ssh-keygen</code>.
 </p>
 <p><b>Note:</b> The screenshots attached below are for Non-NRI instances having <b>/home/phantom-worker</b> as the home directory. For NRI instances, consider <b>/home/phanru</b> as the home directory and <b>phanru</b> as the user. If you are using different user, then consider <b>/home/{your_user_name}</b> as the home directory and <b>{your_user_name}</b> as the user. The steps would remain the same with only a minor change that the user would be <b>phanru</b> or <b>{your_user_name}</b> instead of <b>phantom-worker</b>.</p>
 <ol>
@@ -65,6 +65,9 @@ Using the <code>chown</code> command:<br>
 <p>
 The RSA key should be ready to use in the SSH asset. Based on the above example, configure this by specifying 'id_rsa' as the RSA key file. In the case of a different user, the absolute path to the key must be specified. For example, if keys are added using username <b>testuser</b> having the home directory <b>/home/testuser</b> then <b>/home/testuser/.ssh/id_rsa</b> should be specified as the RSA key file.
 </p>
+
+<h2>Disable SHA2 Algorithms Parameter</h2>
+<p>The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does not have the support of either RSA2 or the "server-sig-algs" protocol extension.</p>
 
 <h2>Verify Last Reboot Time</h2>
 <p>After successfully logging into your SSH server, run the command <code>last reboot</code> which will display all the previous reboot dates and times for the system.</p>

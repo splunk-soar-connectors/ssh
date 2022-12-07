@@ -2,11 +2,11 @@
 # SSH
 
 Publisher: Splunk  
-Connector Version: 2\.3\.11  
+Connector Version: 2\.4\.0  
 Product Vendor: Generic  
 Product Name: SSH  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Minimum Product Version: 5\.3\.5  
 
 This app supports executing various endpoint\-based investigative and containment actions on an SSH endpoint
 
@@ -52,8 +52,8 @@ used with servers where pseudo-terminals are not supported.
 
 ## Key-based authentication
 
-Refer to the following steps to install the authentication keys. Note that the key pair must be
-unencrypted and generated using `     ssh-keygen    ` .
+Refer to the following steps to install the authentication keys in on-prem instance. Note that the
+key pair must be unencrypted and generated using `     ssh-keygen    ` .
 
 **Note:** The screenshots attached below are for Non-NRI instances having **/home/phantom-worker**
 as the home directory. For NRI instances, consider **/home/phanru** as the home directory and
@@ -102,6 +102,11 @@ key must be specified. For example, if keys are added using username **testuser*
 directory **/home/testuser** then **/home/testuser/.ssh/id_rsa** should be specified as the RSA key
 file.
 
+## Disable SHA2 Algorithms Parameter
+
+The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does
+not have the support of either RSA2 or the "server-sig-algs" protocol extension.
+
 ## Verify Last Reboot Time
 
 After successfully logging into your SSH server, run the command `     last reboot    ` which will
@@ -120,6 +125,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **ip\_hostname** |  optional  | string | Device IP/Hostname \(for test connectivity only\)
 **timeout** |  optional  | numeric | Seconds before timeout \(will be applicable for all actions\)
 **pseudo\_terminal** |  optional  | boolean | Enable pseudo\-terminal when running sudo commands
+**disable\_sha2** |  optional  | boolean | Disable SHA2 Algorithms \(For Older SSH instances\)
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validates endpoint connection  

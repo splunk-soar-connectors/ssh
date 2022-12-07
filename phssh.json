@@ -5,7 +5,7 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
-    "app_version": "2.3.11",
+    "app_version": "2.4.0",
     "utctime_updated": "2022-02-02T07:05:42.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
@@ -13,7 +13,7 @@
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.3.5",
     "fips_compliant": true,
     "python_version": "3",
     "latest_tested_versions": [
@@ -30,8 +30,7 @@
         "root": {
             "data_type": "boolean",
             "order": 1,
-            "description": "User is root",
-            "default": false
+            "description": "User is root"
         },
         "password": {
             "data_type": "password",
@@ -57,8 +56,12 @@
         "pseudo_terminal": {
             "data_type": "boolean",
             "order": 6,
-            "description": "Enable pseudo-terminal when running sudo commands",
-            "default": false
+            "description": "Enable pseudo-terminal when running sudo commands"
+        },
+        "disable_sha2": {
+            "data_type": "boolean",
+            "order": 7,
+            "description": "Disable SHA2 Algorithms (For Older SSH instances)"
         }
     },
     "actions": [
@@ -2108,7 +2111,7 @@
             },
             {
                 "module": "bcrypt",
-                "input_file": "wheels/py36/bcrypt-3.2.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl"
+                "input_file": "wheels/py36/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "beautifulsoup4",
@@ -2116,11 +2119,11 @@
             },
             {
                 "module": "cffi",
-                "input_file": "wheels/py36/cffi-1.15.0-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cffi-1.15.1-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-36.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "paramiko",
@@ -2135,12 +2138,8 @@
                 "input_file": "wheels/py36/simplejson-3.17.2-cp36-cp36m-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
-                "module": "six",
-                "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
-            },
-            {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             }
         ]
     },
@@ -2152,7 +2151,7 @@
             },
             {
                 "module": "bcrypt",
-                "input_file": "wheels/py36/bcrypt-3.2.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl"
+                "input_file": "wheels/py36/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "beautifulsoup4",
@@ -2160,11 +2159,11 @@
             },
             {
                 "module": "cffi",
-                "input_file": "wheels/py39/cffi-1.15.0-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py39/cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-36.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "paramiko",
@@ -2179,12 +2178,8 @@
                 "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
-                "module": "six",
-                "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
-            },
-            {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             }
         ]
     }
