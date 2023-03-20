@@ -181,6 +181,18 @@ class SshConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_CONNECTIVITY_FAILED_ERR, err))
 
+        # Get Linux Distribution
+        cmd = "uname -a"
+        status_code, stdout, exit_status = self._send_command(cmd, action_result, suppress=True)
+
+        # Couldn't send command
+        if phantom.is_fail(status_code):
+            return status_code
+
+        # Some version of mac
+        if (exit_status == 0 and stdout.split()[0] == "Darwin"):
+            self.OS_TYPE = OS_MAC
+
         return phantom.APP_SUCCESS
 
     def _send_command(self, command, action_result, passwd="", timeout=0, suppress=False):
@@ -309,20 +321,6 @@ class SshConnector(BaseConnector):
             self.save_progress(SSH_CONNECTIVITY_TEST_ERR)
             return action_result.get_status()
         self.save_progress(SSH_CONNECTIVITY_ESTABLISHED)
-        self.save_progress("Executing 'uname' command...")
-
-        # Get Linux Distribution
-        cmd = "uname -a"
-        status_code, stdout, exit_status = self._send_command(cmd, action_result, suppress=True, timeout=self._timeout)
-
-        # Couldn't send command
-        if phantom.is_fail(status_code):
-            return status_code
-
-        # Some version of mac
-        if (exit_status == 0 and stdout.split()[0] == "Darwin"):
-            self.OS_TYPE = OS_MAC
-        self.debug_print("ssh uname {}".format(stdout))
 
         self.save_progress(SSH_SUCCESS_CONNECTIVITY_TEST)
         return action_result.set_status(phantom.APP_SUCCESS)
