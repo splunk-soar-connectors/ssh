@@ -6,7 +6,7 @@ Connector Version: 2.4.0
 Product Vendor: Generic  
 Product Name: SSH  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.3.5  
+Minimum Product Version: 5.5.0  
 
 This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint
 
