@@ -13,13 +13,13 @@
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.3.5",
+    "min_phantom_version": "5.5.0",
     "fips_compliant": true,
     "python_version": "3",
     "latest_tested_versions": [
         "CentOS Linux 7 (Core)"
     ],
-    "license": "Copyright (c) 2016-2022 Splunk Inc.",
+    "license": "Copyright (c) 2016-2023 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -2103,6 +2103,46 @@
             "versions": "EQ(*)"
         }
     ],
+    "pip39_dependencies": {
+        "wheel": [
+            {
+                "module": "PyNaCl",
+                "input_file": "wheels/py36/PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "bcrypt",
+                "input_file": "wheels/py36/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
+            },
+            {
+                "module": "cffi",
+                "input_file": "wheels/py39/cffi-1.16.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "cryptography",
+                "input_file": "wheels/py36/cryptography-39.0.2-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "paramiko",
+                "input_file": "wheels/shared/paramiko-2.9.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pycparser",
+                "input_file": "wheels/shared/pycparser-2.21-py2.py3-none-any.whl"
+            },
+            {
+                "module": "simplejson",
+                "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
+            }
+        ]
+    },
     "pip_dependencies": {
         "wheel": [
             {
@@ -2123,7 +2163,7 @@
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py36/cryptography-39.0.2-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "paramiko",
@@ -2136,46 +2176,6 @@
             {
                 "module": "simplejson",
                 "input_file": "wheels/py36/simplejson-3.17.2-cp36-cp36m-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
-            }
-        ]
-    },
-    "pip39_dependencies": {
-        "wheel": [
-            {
-                "module": "PyNaCl",
-                "input_file": "wheels/py36/PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "bcrypt",
-                "input_file": "wheels/py36/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
-            },
-            {
-                "module": "cffi",
-                "input_file": "wheels/py39/cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "cryptography",
-                "input_file": "wheels/py36/cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "paramiko",
-                "input_file": "wheels/shared/paramiko-2.9.2-py2.py3-none-any.whl"
-            },
-            {
-                "module": "pycparser",
-                "input_file": "wheels/shared/pycparser-2.21-py2.py3-none-any.whl"
-            },
-            {
-                "module": "simplejson",
-                "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "soupsieve",
