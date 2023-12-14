@@ -2142,6 +2142,5 @@
                 "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
             }
         ]
-    },
-    "pip_dependencies": {}
+    }
 }
