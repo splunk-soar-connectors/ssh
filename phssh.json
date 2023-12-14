@@ -13,7 +13,7 @@
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.5.0",
+    "min_phantom_version": "6.1.1",
     "fips_compliant": true,
     "python_version": "3",
     "latest_tested_versions": [
@@ -2111,7 +2111,7 @@
             },
             {
                 "module": "bcrypt",
-                "input_file": "wheels/py36/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py3/bcrypt-4.1.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "beautifulsoup4",
