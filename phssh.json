@@ -5,7 +5,7 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
-    "app_version": "2.4.1",
+    "app_version": "2.4.2",
     "utctime_updated": "2023-10-31T10:07:22.000000Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
