@@ -1,4 +1,4 @@
 beautifulsoup4==4.9.1
-cryptography==41.0.6
+cryptography==42.0.5
 git+https://github.com/phantomcyber/paramiko.git@3.3.1-fips #paramiko=3.3.1
 simplejson==3.17.2
