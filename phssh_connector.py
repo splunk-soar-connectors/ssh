@@ -162,12 +162,12 @@ class SshConnector(BaseConnector):
             if self._disable_sha2:
                 self.debug_print("Disabling SHA2 algorithms")
                 self._ssh_client.connect(hostname=server, username=self._username, pkey=key,
-                        password=self._password, allow_agent=False, look_for_keys=True,
-                        timeout=FIRST_RECV_TIMEOUT, disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]))
+                                         password=self._password, allow_agent=False, look_for_keys=True,
+                                         timeout=FIRST_RECV_TIMEOUT, disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]))
             else:
                 self._ssh_client.connect(hostname=server, username=self._username, pkey=key,
-                        password=self._password, allow_agent=False, look_for_keys=True,
-                        timeout=FIRST_RECV_TIMEOUT)
+                                         password=self._password, allow_agent=False, look_for_keys=True,
+                                         timeout=FIRST_RECV_TIMEOUT)
         except AuthenticationException:
             return action_result.set_status(phantom.APP_ERROR, SSH_AUTHENTICATION_FAILED_MSG_ERR)
         except BadHostKeyException as e:
@@ -388,7 +388,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                stdout, stdout)
+                                                     stdout, stdout)
 
         self.debug_print("'exec_command' action executed successfully")
         return action_result.get_status()
@@ -470,7 +470,7 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(SSH_ENDPOINT_SHUTDOWN_MSG, SSH_SUCCESS_CMD_SUCCESS))
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                stdout, SSH_SHELL_NO_ERR)
+                                                     stdout, SSH_SHELL_NO_ERR)
 
         return action_result.get_status()
 
@@ -562,7 +562,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                stdout, SSH_PID_TERMINATED_MSG.format(pid=pid))
+                                                     stdout, SSH_PID_TERMINATED_MSG.format(pid=pid))
 
         return action_result.get_status()
 
@@ -592,7 +592,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                stdout, SSH_LOGOFF_USER_MSG.format(username=user_name))
+                                                     stdout, SSH_LOGOFF_USER_MSG.format(username=user_name))
 
         return action_result.get_status()
 
@@ -636,7 +636,7 @@ class SshConnector(BaseConnector):
         # Macs have BSD netstat which doesn't give enough information
         if (self.OS_TYPE == OS_MAC):
             return self._list_connections_mac(param, action_result, passwd,
-                    local_addr, local_port, remote_addr, remote_port)
+                                              local_addr, local_port, remote_addr, remote_port)
 
         cmd = 'sudo -S netstat -etnp'
 
@@ -654,7 +654,7 @@ class SshConnector(BaseConnector):
                 SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout), SSH_IS_NETSTAT_INSTALLED_MSG))
 
         action_result = self._parse_connections(action_result, stdout, cmd,
-                            local_addr, local_port, remote_addr, remote_port)
+                                                local_addr, local_port, remote_addr, remote_port)
 
         return action_result.get_status()
 
@@ -725,7 +725,7 @@ class SshConnector(BaseConnector):
         return action_result
 
     def _list_connections_mac(self, param, action_result, passwd,
-            local_addr, local_port, remote_addr, remote_port):
+                              local_addr, local_port, remote_addr, remote_port):
 
         cmd = "sudo -S lsof -nP -i"
 
@@ -742,7 +742,7 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         action_result = self._parse_connections_mac(action_result, stdout, cmd,
-                            local_addr, local_port, remote_addr, remote_port)
+                                                    local_addr, local_port, remote_addr, remote_port)
 
         return action_result.get_status()
 
@@ -973,8 +973,8 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_REMOTE_IP_OR_PORT_NOT_SPECIFIED_MSG_ERR)
 
         cmd = "sudo -S iptables -I {} -p {} {} {} -j DROP {}".format(direction,
-                                                                      protocol, remote_ip,
-                                                                      port, comment)
+                                                                     protocol, remote_ip,
+                                                                     port, comment)
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -1049,7 +1049,7 @@ class SshConnector(BaseConnector):
             return action_result
 
         action_result = self._output_for_exit_status(action_result, exit_status,
-                "{} Is the iptables service running?".format(stdout), SSH_SHELL_NO_ERR)
+                                                     "{} Is the iptables service running?".format(stdout), SSH_SHELL_NO_ERR)
 
         return action_result
 
@@ -1086,9 +1086,9 @@ class SshConnector(BaseConnector):
         if vault_ret.get('succeeded'):
             action_result.set_status(phantom.APP_SUCCESS, "Transferred file")
             summary = {
-                    phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
-                    phantom.APP_JSON_NAME: file_name,
-                    phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE)}
+                phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
+                phantom.APP_JSON_NAME: file_name,
+                phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE)}
             action_result.update_summary(summary)
 
         return action_result.get_status()
@@ -1142,7 +1142,7 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_MSG_ERR.format(err=err))
         sftp.close()
 
-        summary = {'file_sent': destination_path }
+        summary = {'file_sent': destination_path}
         action_result.update_summary(summary)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1241,8 +1241,8 @@ class SshConnector(BaseConnector):
 
         stdout2 = stdout.replace("%", "")  # clean up % from text
         result = self._parse_generic(data=stdout2,
-                   headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
-                   newline='\n')
+                                     headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
+                                     newline='\n')
         action_result.add_data(result)
         action_result.update_summary({"exit_status": exit_status})
 
@@ -1278,9 +1278,9 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         result = self._parse_generic(data=stdout,
-                       headers=['', 'total', 'used', 'free', 'shared', 'buff/cache', "available"],
-                       newline='\n', best_fit=False,
-                       new_header_names=['Type', 'Total', 'Used', 'Free', 'Shared', 'Buff/Cache', 'Available'])
+                                     headers=['', 'total', 'used', 'free', 'shared', 'buff/cache', "available"],
+                                     newline='\n', best_fit=False,
+                                     new_header_names=['Type', 'Total', 'Used', 'Free', 'Shared', 'Buff/Cache', 'Available'])
         action_result.add_data(result)
         action_result.update_summary({"exit_status": exit_status})
 
