@@ -1065,6 +1065,7 @@ class SshConnector(BaseConnector):
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         file_path = param[SSH_JSON_FILE_PATH]
+        file_path_ascii = bytes(file_path, 'utf-8')
         # /some/dir/file_name
         file_name = file_path.split('/')[-1]
         if hasattr(Vault, 'get_vault_tmp_dir'):
@@ -1074,7 +1075,7 @@ class SshConnector(BaseConnector):
 
         sftp = self._ssh_client.open_sftp()
         try:
-            sftp.get(file_path, vault_path)
+            sftp.get(file_path_ascii, vault_path)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             sftp.close()
