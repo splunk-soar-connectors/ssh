@@ -42,7 +42,6 @@ os.sys.path.insert(0, "{}/paramikossh".format(os.path.dirname(os.path.abspath(__
 
 
 class SshConnector(BaseConnector):
-
     def __init__(self):
         super(SshConnector, self).__init__()
 
@@ -51,7 +50,7 @@ class SshConnector(BaseConnector):
         self.OS_TYPE = OS_LINUX
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """This method is used to get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -74,7 +73,7 @@ class SshConnector(BaseConnector):
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
-        """ This method is to check if the provided input parameter value
+        """This method is to check if the provided input parameter value
         is a non-zero positive integer and returns the integer value of the parameter itself.
 
         :param action_result: Action result or BaseConnector object
@@ -145,7 +144,7 @@ class SshConnector(BaseConnector):
                     elif os.path.exists(ssh_file_path2):
                         key = paramiko.RSAKey.from_private_key_file(ssh_file_path2)
                     else:
-                        raise Exception('No such file or directory')
+                        raise Exception("No such file or directory")
                 self._password = None
 
             except Exception as e:
@@ -161,13 +160,26 @@ class SshConnector(BaseConnector):
         try:
             if self._disable_sha2:
                 self.debug_print("Disabling SHA2 algorithms")
-                self._ssh_client.connect(hostname=server, username=self._username, pkey=key,
-                                         password=self._password, allow_agent=False, look_for_keys=True,
-                                         timeout=FIRST_RECV_TIMEOUT, disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]))
+                self._ssh_client.connect(
+                    hostname=server,
+                    username=self._username,
+                    pkey=key,
+                    password=self._password,
+                    allow_agent=False,
+                    look_for_keys=True,
+                    timeout=FIRST_RECV_TIMEOUT,
+                    disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]),
+                )
             else:
-                self._ssh_client.connect(hostname=server, username=self._username, pkey=key,
-                                         password=self._password, allow_agent=False, look_for_keys=True,
-                                         timeout=FIRST_RECV_TIMEOUT)
+                self._ssh_client.connect(
+                    hostname=server,
+                    username=self._username,
+                    pkey=key,
+                    password=self._password,
+                    allow_agent=False,
+                    look_for_keys=True,
+                    timeout=FIRST_RECV_TIMEOUT,
+                )
         except AuthenticationException:
             return action_result.set_status(phantom.APP_ERROR, SSH_AUTHENTICATION_FAILED_MSG_ERR)
         except BadHostKeyException as e:
@@ -185,12 +197,12 @@ class SshConnector(BaseConnector):
 
     def _send_command(self, command, action_result, passwd="", timeout=0, suppress=False):
         """
-           Args:
-               action_result:  object used to store the status
-               command: command to send
-               passwd:  password, if command needs to be run with root
-               timeout: how long to wait before terminating program
-               suppress: don't send message / heartbeat back to phantom
+        Args:
+            action_result:  object used to store the status
+            command: command to send
+            passwd:  password, if command needs to be run with root
+            timeout: how long to wait before terminating program
+            suppress: don't send message / heartbeat back to phantom
         """
         try:
             output = ""
@@ -232,22 +244,22 @@ class SshConnector(BaseConnector):
         try:
             while True:
                 ctime = int(time.time())
-                if (timeout and ctime - stime >= timeout):
-                    err = 'Error: Timeout after {} seconds'.format(timeout)
+                if timeout and ctime - stime >= timeout:
+                    err = f"Error: Timeout after {timeout} seconds"
                     return action_result.set_status(phantom.APP_ERROR, err), output, 1
-                elif (self._shell_channel.recv_ready()):
-                    output += self._shell_channel.recv(8192).decode('utf-8')
+                elif self._shell_channel.recv_ready():
+                    output += self._shell_channel.recv(8192).decode("utf-8")
                     # This is pretty messy but it's just the way it is I guess
-                    if (sendpw and passwd):
+                    if sendpw and passwd:
                         try:
-                            self._shell_channel.send("{}\n".format(passwd))
+                            self._shell_channel.send(f"{passwd}\n")
                             if not self._pseudo_terminal:
                                 output += "\n"
                         except socket.error:
                             pass
                         sendpw = False
                 # Exit status AND nothing left in output
-                elif (self._shell_channel.exit_status_ready() and not self._shell_channel.recv_ready()):
+                elif self._shell_channel.exit_status_ready() and not self._shell_channel.recv_ready():
                     break
                 else:
                     time.sleep(1)
@@ -276,10 +288,9 @@ class SshConnector(BaseConnector):
         except Exception:
             return None
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def _output_for_exit_status(self, action_result, exit_status,
-                                output_on_err, output_on_succ):
+    def _output_for_exit_status(self, action_result, exit_status, output_on_err, output_on_succ):
         # Shell returned an error
         if exit_status:
             action_result.set_status(phantom.APP_ERROR, output_on_err)
@@ -320,7 +331,7 @@ class SshConnector(BaseConnector):
             return status_code
 
         # Some version of mac
-        if (exit_status == 0 and stdout.split()[0] == "Darwin"):
+        if exit_status == 0 and stdout.split()[0] == "Darwin":
             self.OS_TYPE = OS_MAC
         self.debug_print("ssh uname {}".format(stdout))
 
@@ -351,16 +362,15 @@ class SshConnector(BaseConnector):
             ret_val, timeout = self._validate_integer(action_result, timeout, SSH_JSON_TIMEOUT, False)
             if phantom.is_fail(ret_val):
                 timeout = self._timeout
-                self.debug_print("Invalid value provided in the timeout parameter of the execute program action. {}".format(
-                    SSH_ASSET_TIMEOUT_MSG))
+                self.debug_print(f"Invalid value provided in the timeout parameter of the execute program action. {SSH_ASSET_TIMEOUT_MSG}")
         else:
             timeout = self._timeout
-            self.debug_print("No value found in the timeout parameter of the execute program action. {}".format(SSH_ASSET_TIMEOUT_MSG))
+            self.debug_print(f"No value found in the timeout parameter of the execute program action. {SSH_ASSET_TIMEOUT_MSG}")
 
         script_file = param.get(SSH_JSON_SCRIPT_FILE)
         if script_file:
             try:
-                with open(script_file, 'r') as f:
+                with open(script_file, "r") as f:
                     cmd = f.read()
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
@@ -372,7 +382,7 @@ class SshConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_MSG_ERR)
 
         # Command needs to be run as root
-        if (not self._root and cmd.split()[0] == "sudo"):
+        if not self._root and cmd.split()[0] == "sudo":
             passwd = self._password
             if passwd is None:
                 return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
@@ -387,8 +397,7 @@ class SshConnector(BaseConnector):
             action_result.add_data({"output": stdout})
             return action_result.get_status()
 
-        action_result = self._output_for_exit_status(action_result, exit_status,
-                                                     stdout, stdout)
+        action_result = self._output_for_exit_status(action_result, exit_status, stdout, stdout)
 
         self.debug_print("'exec_command' action executed successfully")
         return action_result.get_status()
@@ -469,8 +478,7 @@ class SshConnector(BaseConnector):
             action_result.update_summary({"exit_status": exit_status})
             return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(SSH_ENDPOINT_SHUTDOWN_MSG, SSH_SUCCESS_CMD_SUCCESS))
 
-        action_result = self._output_for_exit_status(action_result, exit_status,
-                                                     stdout, SSH_SHELL_NO_ERR)
+        action_result = self._output_for_exit_status(action_result, exit_status, stdout, SSH_SHELL_NO_ERR)
 
         return action_result.get_status()
 
@@ -515,8 +523,8 @@ class SshConnector(BaseConnector):
                 r = row.split()
                 d = {}  # Used to store results
                 for i in range(0, len(headers)):
-                    if (i == len(headers) - 1):
-                        d[headers[i].lower()] = ' '.join(r[i:])
+                    if i == len(headers) - 1:
+                        d[headers[i].lower()] = " ".join(r[i:])
                     else:
                         d[headers[i].lower()] = r[i]
                 ll.append(d.copy())
@@ -561,8 +569,7 @@ class SshConnector(BaseConnector):
         if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        action_result = self._output_for_exit_status(action_result, exit_status,
-                                                     stdout, SSH_PID_TERMINATED_MSG.format(pid=pid))
+        action_result = self._output_for_exit_status(action_result, exit_status, stdout, SSH_PID_TERMINATED_MSG.format(pid=pid))
 
         return action_result.get_status()
 
@@ -591,8 +598,7 @@ class SshConnector(BaseConnector):
         if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        action_result = self._output_for_exit_status(action_result, exit_status,
-                                                     stdout, SSH_LOGOFF_USER_MSG.format(username=user_name))
+        action_result = self._output_for_exit_status(action_result, exit_status, stdout, SSH_LOGOFF_USER_MSG.format(username=user_name))
 
         return action_result.get_status()
 
@@ -634,11 +640,10 @@ class SshConnector(BaseConnector):
         remote_port = str(remote_port)
 
         # Macs have BSD netstat which doesn't give enough information
-        if (self.OS_TYPE == OS_MAC):
-            return self._list_connections_mac(param, action_result, passwd,
-                                              local_addr, local_port, remote_addr, remote_port)
+        if self.OS_TYPE == OS_MAC:
+            return self._list_connections_mac(param, action_result, passwd, local_addr, local_port, remote_addr, remote_port)
 
-        cmd = 'sudo -S netstat -etnp'
+        cmd = "sudo -S netstat -etnp"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -649,18 +654,18 @@ class SshConnector(BaseConnector):
         if exit_status:
             action_result.add_data({"output": stdout})
             if not stdout:
-                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_NO_SHELL_OUTPUT_MSG_ERR, SSH_IS_NETSTAT_INSTALLED_MSG))
-            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(
-                SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout), SSH_IS_NETSTAT_INSTALLED_MSG))
+                return action_result.set_status(phantom.APP_ERROR, f"{SSH_NO_SHELL_OUTPUT_MSG_ERR}. {SSH_IS_NETSTAT_INSTALLED_MSG}")
+            return action_result.set_status(
+                phantom.APP_ERROR, f"{SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout)}. {SSH_IS_NETSTAT_INSTALLED_MSG}"
+            )
 
-        action_result = self._parse_connections(action_result, stdout, cmd,
-                                                local_addr, local_port, remote_addr, remote_port)
+        action_result = self._parse_connections(action_result, stdout, cmd, local_addr, local_port, remote_addr, remote_port)
 
         return action_result.get_status()
 
     def _parse_connections(self, action_result, stdout, cmd, la, lp, ra, rp):
-        """ Process output for connections
-            PROTO Rec-Q Send-Q Local_Address Foreign_Address State User Inode Pid/Program_Name
+        """Process output for connections
+        PROTO Rec-Q Send-Q Local_Address Foreign_Address State User Inode Pid/Program_Name
         """
         try:
             ll = []  # List to store dictionaries
@@ -676,38 +681,38 @@ class SshConnector(BaseConnector):
                 d["rec_q"] = r[1]
                 d["send_q"] = r[2]
                 try:
-                    s = r[3].split(':')
+                    s = r[3].split(":")
                     d["local_port"] = s[-1]
-                    if (lp and d["local_port"] != lp):
+                    if lp and d["local_port"] != lp:
                         continue
                     del s[-1]
                     d["local_ip"] = ":".join(s)
-                    if (la and d["local_ip"] != la):
+                    if la and d["local_ip"] != la:
                         continue
-                except Exception:           # Some error parsing
+                except Exception:  # Some error parsing
                     d["local_port"] = ""
                     d["local_ip"] = ""
                 try:
-                    s = r[4].split(':')
+                    s = r[4].split(":")
                     d["remote_port"] = s[-1]
-                    if (rp and d["remote_port"] != rp):
+                    if rp and d["remote_port"] != rp:
                         continue
                     del s[-1]
                     d["remote_ip"] = ":".join(s)
-                    if (ra and d["remote_ip"] != ra):
+                    if ra and d["remote_ip"] != ra:
                         continue
-                except Exception:           # Some error parsing
+                except Exception:  # Some error parsing
                     d["remote_port"] = ""
                     d["remote_ip"] = ""
                 d["state"] = r[5]
                 d["uid"] = r[6]
                 d["inode"] = r[7]
                 try:
-                    if (r[8] == "-"):
+                    if r[8] == "-":
                         d["pid"] = ""
                         d["cmd"] = ""
                     else:
-                        s = r[8].split('/')
+                        s = r[8].split("/")
                         d["pid"] = s[0]
                         del s[0]
                         d["cmd"] = "/".join(s)
@@ -724,8 +729,7 @@ class SshConnector(BaseConnector):
 
         return action_result
 
-    def _list_connections_mac(self, param, action_result, passwd,
-                              local_addr, local_port, remote_addr, remote_port):
+    def _list_connections_mac(self, param, action_result, passwd, local_addr, local_port, remote_addr, remote_port):
 
         cmd = "sudo -S lsof -nP -i"
 
@@ -741,14 +745,13 @@ class SshConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
             return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
-        action_result = self._parse_connections_mac(action_result, stdout, cmd,
-                                                    local_addr, local_port, remote_addr, remote_port)
+        action_result = self._parse_connections_mac(action_result, stdout, cmd, local_addr, local_port, remote_addr, remote_port)
 
         return action_result.get_status()
 
     def _parse_connections_mac(self, action_result, stdout, cmd, la, lp, ra, rp):
-        """ Process output for connections
-            COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME (STATE)?
+        """Process output for connections
+        COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME (STATE)?
         """
         try:
             ll = []  # List to store dictionaries
@@ -760,53 +763,53 @@ class SshConnector(BaseConnector):
             for row in rows[1:]:  # Skip the first line
                 r = row.split()
                 d = {}
-                d['cmd'] = r[0]
-                d['pid'] = r[1]
-                d['uid'] = r[2]
-                d['fd'] = r[3]
-                d['type'] = r[4]
-                d['device'] = r[5]
-                d['sizeoff'] = r[6]
-                d['protocol'] = r[7]
-                n = r[8].split('->')
+                d["cmd"] = r[0]
+                d["pid"] = r[1]
+                d["uid"] = r[2]
+                d["fd"] = r[3]
+                d["type"] = r[4]
+                d["device"] = r[5]
+                d["sizeoff"] = r[6]
+                d["protocol"] = r[7]
+                n = r[8].split("->")
                 if len(n) == 2:
                     # Get Local
-                    s = n[0].split(':')
-                    d['local_port'] = s[-1]
-                    if lp and d['local_port'] != lp:
+                    s = n[0].split(":")
+                    d["local_port"] = s[-1]
+                    if lp and d["local_port"] != lp:
                         continue
                     del s[-1]
-                    d['local_ip'] = ':'.join(s)
-                    if la and d['local_ip'] != la:
+                    d["local_ip"] = ":".join(s)
+                    if la and d["local_ip"] != la:
                         continue
                     # Get Remote
-                    s = n[1].split(':')
-                    d['remote_port'] = s[-1]
-                    if rp and d['remote_port'] != rp:
+                    s = n[1].split(":")
+                    d["remote_port"] = s[-1]
+                    if rp and d["remote_port"] != rp:
                         continue
                     del s[-1]
-                    d['remote_ip'] = ':'.join(s)
-                    if ra and d['remote_ip'] != ra:
+                    d["remote_ip"] = ":".join(s)
+                    if ra and d["remote_ip"] != ra:
                         continue
                 else:
                     # If there is no remote connection (as many things will display),
                     #  and they are being filtered, don't add
-                    if (rp or ra):
+                    if rp or ra:
                         continue
-                    s = n[0].split(':')
-                    d['local_port'] = s[-1]
-                    if (lp and d['local_port'] != lp):
+                    s = n[0].split(":")
+                    d["local_port"] = s[-1]
+                    if lp and d["local_port"] != lp:
                         continue
                     del s[-1]
-                    d['local_ip'] = ':'.join(s)
-                    if (la and d['local_ip'] != la):
+                    d["local_ip"] = ":".join(s)
+                    if la and d["local_ip"] != la:
                         continue
-                    d['remote_port'] = ""
-                    d['remote_ip'] = ""
+                    d["remote_port"] = ""
+                    d["remote_ip"] = ""
                 try:
-                    d['state'] = r[9][1:-1]  # Ignore paranthesis
+                    d["state"] = r[9][1:-1]  # Ignore paranthesis
                 except Exception:
-                    d['state'] = ""
+                    d["state"] = ""
                 ll.append(d.copy())
 
             action_result.add_data({"connections": ll})
@@ -828,7 +831,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
-        if (self.OS_TYPE == OS_MAC):
+        if self.OS_TYPE == OS_MAC:
             return action_result.set_status(phantom.APP_ERROR, SSH_FIREWALL_CMDS_NOT_SUPPORTED_ERR)
 
         passwd = self._password
@@ -848,7 +851,7 @@ class SshConnector(BaseConnector):
         port = str(port)
         chain = param.get(SSH_JSON_CHAIN, "")
 
-        cmd = 'sudo -S iptables -L {} --line-numbers -n'.format(chain)
+        cmd = f"sudo -S iptables -L {chain} --line-numbers -n"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -875,29 +878,29 @@ class SshConnector(BaseConnector):
             rows = stdout.splitlines()
 
             i = 0
-            while (i < len(rows)):
+            while i < len(rows):
                 cur_chain = rows[i].split()[1]  # Name of chain
-                i += 2                          # Skip header row
-                while (i < len(rows)):
-                    if (rows[i] == ""):
+                i += 2  # Skip header row
+                while i < len(rows):
+                    if rows[i] == "":
                         i += 1
-                        break                   # New Chain
+                        break  # New Chain
                     row = rows[i].split()
-                    if (len(row) >= 6):         # This is hopefully always true
+                    if len(row) >= 6:  # This is hopefully always true
                         d["chain"] = cur_chain
                         d["num"] = row[0]
                         d["target"] = row[1]
-                        if (prot and row[2] != prot):
+                        if prot and row[2] != prot:
                             i += 1
                             continue
                         d["protocol"] = row[2]
                         d["source"] = row[4]
                         d["destination"] = row[5]
-                        try:                    # the rest can contain port numbers, comments, and other things
+                        try:  # the rest can contain port numbers, comments, and other things
                             the_rest = " ".join(row[6:])
                         except Exception:
                             the_rest = ""
-                        if (port and port not in the_rest):
+                        if port and port not in the_rest:
                             i += 1
                             continue
                         d["options"] = the_rest
@@ -922,7 +925,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
-        if (self.OS_TYPE == OS_MAC):
+        if self.OS_TYPE == OS_MAC:
             return action_result.set_status(phantom.APP_ERROR, SSH_FIREWALL_CMDS_NOT_SUPPORTED_ERR)
 
         no_ip = True
@@ -956,25 +959,23 @@ class SshConnector(BaseConnector):
 
         if remote_port:
             if direction == "INPUT":
-                port = "--destination-port {}".format(remote_port)
+                port = f"--destination-port {remote_port}"
             else:
-                port = "-dport {}".format(remote_port)
+                port = f"-dport {remote_port}"
             no_port = False
         else:
             port = ""
 
         user_comment = param.get(SSH_JSON_COMMENT)
         if user_comment:
-            comment = "-m comment --comment '{} -- Added by Phantom'".format(user_comment)
+            comment = f"-m comment --comment '{user_comment} -- Added by Phantom'"
         else:
             comment = "-m comment --comment 'Added by Phantom'"
 
-        if (no_ip and no_port):
+        if no_ip and no_port:
             return action_result.set_status(phantom.APP_ERROR, SSH_REMOTE_IP_OR_PORT_NOT_SPECIFIED_MSG_ERR)
 
-        cmd = "sudo -S iptables -I {} -p {} {} {} -j DROP {}".format(direction,
-                                                                     protocol, remote_ip,
-                                                                     port, comment)
+        cmd = f"sudo -S iptables -I {direction} -p {protocol} {remote_ip} {port} -j DROP {comment}"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
 
@@ -992,8 +993,8 @@ class SshConnector(BaseConnector):
         return action_result.get_status()
 
     def _handle_ssh_delete_fw_rule(self, param):
-        """ Should this be changed to only delete rules
-             created by Phantom?
+        """Should this be changed to only delete rules
+        created by Phantom?
         """
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
@@ -1004,7 +1005,7 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
-        if (self.OS_TYPE == OS_MAC):
+        if self.OS_TYPE == OS_MAC:
             return action_result.set_status(phantom.APP_ERROR, SSH_FIREWALL_CMDS_NOT_SUPPORTED_ERR)
 
         passwd = self._password
@@ -1039,8 +1040,7 @@ class SshConnector(BaseConnector):
         return action_result.get_status()
 
     def _save_iptables(self, action_result, passwd):
-        """ iptables needs to be saved after a command modifies it
-        """
+        """iptables needs to be saved after a command modifies it"""
         cmd = "sudo -S service iptables save"
 
         status_code, stdout, exit_status = self._send_command(cmd, action_result, passwd=passwd, timeout=self._timeout)
@@ -1048,8 +1048,7 @@ class SshConnector(BaseConnector):
         if phantom.is_fail(status_code):
             return action_result
 
-        action_result = self._output_for_exit_status(action_result, exit_status,
-                                                     "{} Is the iptables service running?".format(stdout), SSH_SHELL_NO_ERR)
+        action_result = self._output_for_exit_status(action_result, exit_status, f"{stdout} Is the iptables service running?", SSH_SHELL_NO_ERR)
 
         return action_result
 
@@ -1065,13 +1064,13 @@ class SshConnector(BaseConnector):
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
         file_path = param[SSH_JSON_FILE_PATH]
-        file_path_ascii = bytes(file_path, 'utf-8')
+        file_path_ascii = bytes(file_path, "utf-8")
         # /some/dir/file_name
-        file_name = file_path.split('/')[-1]
-        if hasattr(Vault, 'get_vault_tmp_dir'):
-            vault_path = '{}/{}'.format(Vault.get_vault_tmp_dir(), file_name)
+        file_name = file_path.split("/")[-1]
+        if hasattr(Vault, "get_vault_tmp_dir"):
+            vault_path = f"{Vault.get_vault_tmp_dir()}/{file_name}"
         else:
-            vault_path = '/vault/tmp/{}'.format(file_name)
+            vault_path = f"/vault/tmp/{file_name}"
 
         sftp = self._ssh_client.open_sftp()
         try:
@@ -1083,12 +1082,13 @@ class SshConnector(BaseConnector):
 
         sftp.close()
         vault_ret = Vault.add_attachment(vault_path, self.get_container_id(), file_name=file_name)
-        if vault_ret.get('succeeded'):
+        if vault_ret.get("succeeded"):
             action_result.set_status(phantom.APP_SUCCESS, "Transferred file")
             summary = {
                 phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
                 phantom.APP_JSON_NAME: file_name,
-                phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE)}
+                phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE),
+            }
             action_result.update_summary(summary)
 
         return action_result.get_status()
@@ -1109,24 +1109,24 @@ class SshConnector(BaseConnector):
             success, message, vault_meta_info = ph_rules.vault_info(vault_id=param[SSH_JSON_VAULT_ID])
             vault_meta_info = list(vault_meta_info)
             if not success or not vault_meta_info:
-                error_msg = " Error Details: {}".format(unquote(message)) if message else ''
+                error_msg = " Error Details: {}".format(unquote(message)) if message else ""
                 return action_result.set_status(phantom.APP_ERROR, "{}.{}".format(SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_MSG_ERR, error_msg))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_MSG_ERR, err))
 
         # phantom vault file path
-        file_path = vault_meta_info[0].get('path')
+        file_path = vault_meta_info[0].get("path")
 
         # phantom vault file name
-        dest_file_name = vault_meta_info[0].get('name')
+        dest_file_name = vault_meta_info[0].get("name")
         file_dest = param[SSH_JSON_FILE_DEST]
 
         # Returning an error if the filename is included in the file_destination path
         if dest_file_name in file_dest:
             return action_result.set_status(phantom.APP_ERROR, SSH_EXCLUDE_FILENAME_MSG_ERR)
 
-        destination_path = "{}{}{}".format(param[SSH_JSON_FILE_DEST], '/' if param[SSH_JSON_FILE_DEST][-1] != '/' else '', dest_file_name)
+        destination_path = "{}{}{}".format(param[SSH_JSON_FILE_DEST], "/" if param[SSH_JSON_FILE_DEST][-1] != "/" else "", dest_file_name)
 
         sftp = self._ssh_client.open_sftp()
         try:
@@ -1142,7 +1142,7 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_PUT_FILE_MSG_ERR.format(err=err))
         sftp.close()
 
-        summary = {'file_sent': destination_path}
+        summary = {"file_sent": destination_path}
         action_result.update_summary(summary)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1155,7 +1155,7 @@ class SshConnector(BaseConnector):
         else:
             return mb_val
 
-    def _parse_generic(self, data=None, headers=None, newline='\n', best_fit=True, new_header_names=None, action_result=None):
+    def _parse_generic(self, data=None, headers=None, newline="\n", best_fit=True, new_header_names=None, action_result=None):
         # header_locator should be a list of the headers returned in the results
         # ie for df -hP, this would be ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
         # if best_fit is True, all rows are expected to have the same number of columns as headers.
@@ -1165,7 +1165,7 @@ class SshConnector(BaseConnector):
         for line in data.split(newline):
             found_header = False
             for header in headers:
-                if header in line and header != '':
+                if header in line and header != "":
                     found_header = True
                     break
             #
@@ -1176,12 +1176,12 @@ class SshConnector(BaseConnector):
             elif len(line.split()) == 0:
                 continue
             elif best_fit and len(line.split()) != len(headers):
-                temp['error_message'] = SSH_PARSE_HEADER_ERR.format(len(headers), headers, len(line), line)
+                temp["error_message"] = SSH_PARSE_HEADER_ERR.format(len(headers), headers, len(line), line)
                 continue
 
             if best_fit:
                 for num, val in enumerate(line.strip().split()):
-                    if headers[num] == '':
+                    if headers[num] == "":
                         continue
                     else:
                         if new_header_names:
@@ -1192,21 +1192,21 @@ class SshConnector(BaseConnector):
                 for num in range(0, len(headers)):
                     linedata = line.strip().split()
                     if new_header_names:
-                        if new_header_names[num] == '' and headers[num] == '':
+                        if new_header_names[num] == "" and headers[num] == "":
                             continue
-                    elif headers[num] == '':
+                    elif headers[num] == "":
                         continue
                     if new_header_names:
                         try:
                             temp[new_header_names[num]] = self._mb_to_gb(linedata[num])
                         except Exception:
-                            temp[new_header_names[num]] = ''
+                            temp[new_header_names[num]] = ""
                     else:
                         try:
                             temp[headers[num]] = self._mb_to_gb(linedata[num])
                         except Exception:
-                            temp[headers[num]] = ''
-            temp['raw'] = line
+                            temp[headers[num]] = ""
+            temp["raw"] = line
             results.append(temp)
         return results
 
@@ -1240,9 +1240,7 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
         stdout2 = stdout.replace("%", "")  # clean up % from text
-        result = self._parse_generic(data=stdout2,
-                                     headers=['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on'],
-                                     newline='\n')
+        result = self._parse_generic(data=stdout2, headers=["Filesystem", "Size", "Used", "Avail", "Use%", "Mounted on"], newline="\n")
         action_result.add_data(result)
         action_result.update_summary({"exit_status": exit_status})
 
@@ -1277,10 +1275,13 @@ class SshConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, SSH_NO_SHELL_OUTPUT_MSG_ERR)
             return action_result.set_status(phantom.APP_ERROR, SSH_SHELL_OUTPUT_MSG_ERR.format(stdout=stdout))
 
-        result = self._parse_generic(data=stdout,
-                                     headers=['', 'total', 'used', 'free', 'shared', 'buff/cache', "available"],
-                                     newline='\n', best_fit=False,
-                                     new_header_names=['Type', 'Total', 'Used', 'Free', 'Shared', 'Buff/Cache', 'Available'])
+        result = self._parse_generic(
+            data=stdout,
+            headers=["", "total", "used", "free", "shared", "buff/cache", "available"],
+            newline="\n",
+            best_fit=False,
+            new_header_names=["Type", "Total", "Used", "Free", "Shared", "Buff/Cache", "Available"],
+        )
         action_result.add_data(result)
         action_result.update_summary({"exit_status": exit_status})
 
@@ -1303,46 +1304,47 @@ class SshConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if (action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        if action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
-        elif (action_id == ACTION_ID_EXEC_COMMAND):
+        elif action_id == ACTION_ID_EXEC_COMMAND:
             ret_val = self._handle_ssh_execute_command(param)
-        elif (action_id == ACTION_ID_REBOOT_SERVER):
+        elif action_id == ACTION_ID_REBOOT_SERVER:
             ret_val = self._handle_ssh_reboot_server(param)
-        elif (action_id == ACTION_ID_SHUTDOWN_SERVER):
+        elif action_id == ACTION_ID_SHUTDOWN_SERVER:
             ret_val = self._handle_ssh_shutdown_server(param)
-        elif (action_id == ACTION_ID_LIST_PROCESSES):
+        elif action_id == ACTION_ID_LIST_PROCESSES:
             ret_val = self._handle_ssh_list_processes(param)
-        elif (action_id == ACTION_ID_TERMINATE_PROCESS):
+        elif action_id == ACTION_ID_TERMINATE_PROCESS:
             ret_val = self._handle_ssh_kill_process(param)
-        elif (action_id == ACTION_ID_LOGOUT_USER):
+        elif action_id == ACTION_ID_LOGOUT_USER:
             ret_val = self._handle_ssh_logout_user(param)
-        elif (action_id == ACTION_ID_LIST_CONNECTIVITY):
+        elif action_id == ACTION_ID_LIST_CONNECTIVITY:
             ret_val = self._handle_ssh_list_conn(param)
-        elif (action_id == ACTION_ID_LIST_FW_RULES):
+        elif action_id == ACTION_ID_LIST_FW_RULES:
             ret_val = self._handle_ssh_list_fw_rules(param)
-        elif (action_id == ACTION_ID_BLOCK_IP):
+        elif action_id == ACTION_ID_BLOCK_IP:
             ret_val = self._handle_ssh_block_ip(param)
-        elif (action_id == ACTION_ID_DELETE_FW_RULE):
+        elif action_id == ACTION_ID_DELETE_FW_RULE:
             ret_val = self._handle_ssh_delete_fw_rule(param)
-        elif (action_id == ACTION_ID_GET_FILE):
+        elif action_id == ACTION_ID_GET_FILE:
             ret_val = self._handle_ssh_get_file(param)
-        elif (action_id == ACTION_ID_GET_MEMORY_USAGE):
+        elif action_id == ACTION_ID_GET_MEMORY_USAGE:
             ret_val = self._handle_get_memory_usage(param)
-        elif (action_id == ACTION_ID_GET_DISK_USAGE):
+        elif action_id == ACTION_ID_GET_DISK_USAGE:
             ret_val = self._handle_get_disk_usage(param)
-        elif (action_id == ACTION_ID_PUT_FILE):
+        elif action_id == ACTION_ID_PUT_FILE:
             ret_val = self._handle_ssh_put_file(param)
 
         return ret_val
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import pudb
+
     pudb.set_trace()
 
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         print("No test json specified as input")
         sys.exit(0)
 
