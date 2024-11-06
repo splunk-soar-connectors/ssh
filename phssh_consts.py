@@ -63,9 +63,9 @@ SSH_JSON_NUMBER = "number"
 SSH_JSON_FILE_PATH = "file_path"
 SSH_JSON_TIMEOUT = "timeout"
 SSH_JSON_PSEUDO_TERMINAL = "pseudo_terminal"
-SSH_JSON_VAULT_ID = 'vault_id'
-SSH_JSON_FILE_DEST = 'file_destination'
-SSH_JSON_DISABLE_SHA2 = 'disable_sha2'
+SSH_JSON_VAULT_ID = "vault_id"
+SSH_JSON_FILE_DEST = "file_destination"
+SSH_JSON_DISABLE_SHA2 = "disable_sha2"
 
 SSH_CONNECTIVITY_FAILED_ERR = "Could not establish SSH connection to server"
 SSH_CONNECTIVITY_ESTABLISHED = "Established SSH connection to server"
@@ -108,8 +108,10 @@ SSH_ASSET_TIMEOUT_MSG = "Considering the timeout value from the asset configurat
 # constants relating to 'get_error_message_from_exception'
 SSH_MSG_UNAVAILABLE_ERR = "Error message unavailable. Please check the asset configuration and|or action parameters."
 SSH_CODE_UNAVAILABLE_ERR = "Error code unavailable"
-SSH_UNICODE_DAMMIT_TYPE_MSG_ERR = ("Error occurred while connecting to the SSH server. ",
-"Please check the asset configuration and|or the action parameters.")
+SSH_UNICODE_DAMMIT_TYPE_MSG_ERR = (
+    "Error occurred while connecting to the SSH server. ",
+    "Please check the asset configuration and|or the action parameters.",
+)
 
 # constants relating to 'validate_integer'
 SSH_VALID_INT_MSG = "Please provide a valid integer value in the '{param}' parameter"
