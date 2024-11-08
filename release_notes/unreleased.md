@@ -1,3 +1,1 @@
 **Unreleased**
-
-* Update paramiko library for vulnerability [PAPP-34921]
