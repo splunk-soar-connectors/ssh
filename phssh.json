@@ -19,7 +19,7 @@
     "latest_tested_versions": [
         "CentOS Linux 7 (Core)"
     ],
-    "license": "Copyright (c) 2016-2024 Splunk Inc.",
+    "license": "Copyright (c) 2016-2025 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",

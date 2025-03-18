@@ -1,10 +1,9 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
-
-{% block widget_content %} <!-- Main Start Block -->
-
+{% block widget_content %}
+  <!-- Main Start Block -->
   <!-- File: ssh_output.html
-    Copyright (c) 2016-2024 Splunk Inc.
+    Copyright (c) 2016-2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,10 +16,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
 either express or implied. See the License for the specific language governing permissions
 and limitations under the License.
 -->
-
   <style>
-
-
     .ssh_output {
       overflow: scroll;
       width: 100%;
@@ -46,12 +42,15 @@ and limitations under the License.
     }
 
   </style>
-  <div class="ssh_output"> <!-- Main Div -->
-  {% for result in results %} <!-- loop for each result -->
-    stdout/stderr for <b>{{ result.parameter.ip_hostname }}</b>:<br>
-    <pre class="output">{{ result.output }}
+  <div class="ssh_output">
+    <!-- Main Div -->
+    {% for result in results %}
+      <!-- loop for each result -->
+      stdout/stderr for <b>{{ result.parameter.ip_hostname }}</b>:
+      <br>
+      <pre class="output">{{ result.output }}
       <div class="{% if result.success %}success{% else %}error{% endif %}">{{result.message}}</div>
     </pre>
-  {% endfor %}
+    {% endfor %}
   </div>
 {% endblock %}
