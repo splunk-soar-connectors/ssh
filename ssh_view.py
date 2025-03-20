@@ -1,6 +1,6 @@
 # File: ssh_view.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ def _get_ssh_output_ctx(result):
         ctx_result["success"] = True
     else:
         if ctx_result["message"] == ctx_result.get("output") and ctx_result.get("summary"):
-            ctx_result["message"] = f'Exit status: {ctx_result["summary"].get("exit_status")}'
+            ctx_result["message"] = f"Exit status: {ctx_result['summary'].get('exit_status')}"
     return ctx_result
 
 
