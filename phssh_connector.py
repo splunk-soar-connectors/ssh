@@ -18,6 +18,7 @@
 import os
 import sys
 import time
+from contextlib import closing
 from socket import gaierror as SocketError
 
 import paramiko
@@ -1056,15 +1057,13 @@ class SshConnector(BaseConnector):
         else:
             vault_path = f"/vault/tmp/{file_name}"
 
-        sftp = self._ssh_client.open_sftp()
-        try:
-            sftp.get(file_path_ascii, vault_path)
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            sftp.close()
-            return action_result.set_status(phantom.APP_ERROR, SSH_GET_FILE_MSG_ERR.format(err=err))
+        with closing(self._ssh_client.open_sftp()) as sftp:
+            try:
+                sftp.get(file_path_ascii, vault_path)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, SSH_GET_FILE_MSG_ERR.format(err=err))
 
-        sftp.close()
         vault_ret = Vault.add_attachment(vault_path, self.get_container_id(), file_name=file_name)
         if vault_ret.get("succeeded"):
             action_result.set_status(phantom.APP_SUCCESS, "Transferred file")
@@ -1074,6 +1073,8 @@ class SshConnector(BaseConnector):
                 phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE),
             }
             action_result.update_summary(summary)
+        else:
+            action_result.set_status(phantom.APP_ERROR, f"Failed to add file to vault: {vault_ret.get('message', 'unknown error')}")
 
         return action_result.get_status()
 
