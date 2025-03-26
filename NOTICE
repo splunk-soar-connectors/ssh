@@ -1,30 +1,49 @@
 Splunk SOAR SSH
-Copyright (c) 2016-2022 Splunk Inc.
+Copyright (c) 2016-2025 Splunk Inc.
 
-Third-party Software Attributions:
+Third Party Software Attributions:
 
-Library: beautifulsoup4
+Name: bcrypt
+Version: 4.3.0
+Author:
+License: Apache-2.0
+
+Name: beautifulsoup4
 Version: 4.9.1
+Author: Leonard Richardson
 License: MIT
-Copyright 2004-2017 Leonard Richardson
-Copyright 2004-2019 Leonard Richardson
-Copyright 2018 Isaac Muse
 
-Library: pycparser
-Version: 2.21
-License: BSD 3
-Copyright 2008-2020 Eli Bendersky
-Copyright parser in Python
-Copyright parser in Python
+Name: cffi
+Version: 1.17.1
+Author: Armin Rigo, Maciej Fijalkowski
+License: MIT
 
-Library: simplejson
+Name: cryptography
+Version: 42.0.5
+Author:
+License: Apache-2.0 OR BSD-3-Clause
+
+Name: paramiko
+Version: 3.5.0
+Author: Jeff Forcier
+License: LGPL
+
+Name: pycparser
+Version: 2.22
+Author: Eli Bendersky
+License: BSD-3-Clause
+
+Name: PyNaCl
+Version: 1.5.0
+Author: The PyNaCl developers
+License: Apache License 2.0
+
+Name: simplejson
 Version: 3.17.2
-License: Academic 2.1
-License: MIT
-Copyright 2003-2004 Lawrence E
-Copyright 2006 Bob Ippolito
+Author: Bob Ippolito
+License: MIT License
 
-Library: six
-Version: 1.16.0
-License: MIT
-Copyright 2010-2020 Benjamin Peterson
+Name: soupsieve
+Version: 2.6
+Author:
+License:
