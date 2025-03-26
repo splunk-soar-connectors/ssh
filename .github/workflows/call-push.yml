@@ -8,4 +8,4 @@ on:
 
 jobs:
   call-push:
-    uses: splunk-soar-connectors/.github/.github/workflows/push.yml@main
+    uses: splunk-soar-connectors/.github/.github/workflows/push.yml@maint/automation-broker-fix
