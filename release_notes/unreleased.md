@@ -1,3 +1,3 @@
 **Unreleased**
 
-* fix: Improve failure messages in `get file` action
+* fix: Workflow file updates
