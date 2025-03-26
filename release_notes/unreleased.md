@@ -1,3 +1,3 @@
 **Unreleased**
 
-* chore: batch changes
+* fix: Improve failure messages in `get file` action
