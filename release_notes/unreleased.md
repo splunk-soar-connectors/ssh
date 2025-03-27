@@ -1,4 +1,3 @@
 **Unreleased**
-* ** Unreleased **
 
-* fix: Improve failure messages in `get file` action
+* fix: App dependency updates and NOTICE file generation
