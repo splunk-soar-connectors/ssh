@@ -1,4 +1,3 @@
 **Unreleased**
-* ** Unreleased **
 
-* fix: Improve failure messages in `get file` action
+* chore(ci): Pre-commit config updates
