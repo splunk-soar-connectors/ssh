@@ -1,4 +1,4 @@
 **Unreleased**
 * ** Unreleased **
 
-* fix: Improve failure messages in `get file` action
+* fix: Lower min_phantom_version to 6.2.0
