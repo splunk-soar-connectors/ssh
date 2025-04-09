@@ -2115,11 +2115,11 @@
             },
             {
                 "module": "cffi",
-                "input_file": "wheels/py313/cffi-1.17.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py313/cffi-1.17.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py39/cryptography-42.0.5-cp39-abi3-manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py39/cryptography-44.0.1-cp39-abi3-manylinux_2_28_x86_64.whl"
             },
             {
                 "module": "paramiko",
@@ -2151,7 +2151,7 @@
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py39/cryptography-42.0.5-cp39-abi3-manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py39/cryptography-44.0.1-cp39-abi3-manylinux_2_28_x86_64.whl"
             },
             {
                 "module": "paramiko",
