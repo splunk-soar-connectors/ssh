@@ -5,8 +5,8 @@
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
-    "app_version": "2.4.7",
-    "utctime_updated": "2025-04-10T07:14:08.921112Z",
+    "app_version": "2.4.8",
+    "utctime_updated": "2025-07-30T17:54:09.392551Z",
     "package_name": "phantom_ssh",
     "product_vendor": "Generic",
     "product_name": "SSH",
@@ -15,7 +15,10 @@
     "product_version_regex": ".*",
     "min_phantom_version": "6.2.0",
     "fips_compliant": true,
-    "python_version": ["3.9", "3.13"],
+    "python_version": [
+        "3.9",
+        "3.13"
+    ],
     "latest_tested_versions": [
         "CentOS Linux 7 (Core)"
     ],
