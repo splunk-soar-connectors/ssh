@@ -71,7 +71,7 @@
         "powerbroker": {
             "data_type": "boolean",
             "order": 8,
-            "description": "Enable Support for PowerBroker (pbrun)"
+            "description": "Enable support for PowerBroker (pbrun) root delegation"
         }
     },
     "actions": [
