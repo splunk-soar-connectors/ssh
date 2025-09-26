@@ -79,6 +79,10 @@ file.
 The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does
 not have the support of either RSA2 or the "server-sig-algs" protocol extension.
 
+## Enable PowerBroker Support
+
+When PowerBroker support is enabled in the asset configuration, the SSH connector will check if the `pbrun` command is present in the command parameter. If `pbrun` is detected in the command, the connector will automatically inject the configured password when executing the command, allowing seamless integration with PowerBroker-managed environments for elevated access control.
+
 ## Verify Last Reboot Time
 
 After successfully logging into your SSH server, run the command `     last reboot    ` which will

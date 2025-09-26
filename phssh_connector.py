@@ -111,6 +111,7 @@ class SshConnector(BaseConnector):
 
         self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
         self._disable_sha2 = config.get(SSH_JSON_DISABLE_SHA2, False)
+        self._powerbroker = config.get(SSH_JSON_POWERBROKER, False)
         # integer validation for 'timeout' config parameter
         timeout = config.get(SSH_JSON_TIMEOUT)
         ret_val, self._timeout = self._validate_integer(self, timeout, SSH_JSON_TIMEOUT)
@@ -278,7 +279,7 @@ class SshConnector(BaseConnector):
         try:
             lines = []
             for index, line in enumerate(stdout.splitlines()):
-                if (passwd and passwd in line) or ("[sudo] password for" in line):
+                if (passwd and passwd in line) or ("[sudo] password for" in line) or (self._powerbroker and "Password:" in line):
                     if passwd and passwd in line:
                         self.debug_print(f"Password found at index: {index}")
                     continue
@@ -378,7 +379,7 @@ class SshConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, SSH_COMMAND_OR_SCRIPT_FILE_NOT_PROVIDED_MSG_ERR)
 
         # Command needs to be run as root
-        if not self._root and cmd.split()[0] == "sudo":
+        if not self._root and (cmd.split()[0] == "sudo" or (self._powerbroker and cmd.split()[0] == "pbrun")):
             passwd = self._password
             if passwd is None:
                 return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
