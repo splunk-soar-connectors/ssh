@@ -2,6 +2,11 @@
     "appid": "d37aa7fe-c973-44ee-a164-2ca5bf321b1f",
     "name": "SSH",
     "publisher": "Splunk",
+    "contributors": [
+        {
+            "name": "Alan Shaikh"
+        }
+    ],
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
     "type": "endpoint",
     "main_module": "phssh_connector.py",
@@ -62,6 +67,11 @@
             "data_type": "boolean",
             "order": 7,
             "description": "Disable SHA2 Algorithms (For Older SSH instances)"
+        },
+        "powerbroker": {
+            "data_type": "boolean",
+            "order": 8,
+            "description": "Enable support for PowerBroker (pbrun) root delegation"
         }
     },
     "actions": [
