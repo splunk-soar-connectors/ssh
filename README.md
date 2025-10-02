@@ -1,9 +1,9 @@
 # SSH
 
-Publisher: Splunk \
-Connector Version: 2.4.9 \
-Product Vendor: Generic \
-Product Name: SSH \
+Publisher: Splunk <br>
+Connector Version: 2.4.9 <br>
+Product Vendor: Generic <br>
+Product Name: SSH <br>
 Minimum Product Version: 6.2.0
 
 This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint
@@ -89,6 +89,10 @@ file.
 The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does
 not have the support of either RSA2 or the "server-sig-algs" protocol extension.
 
+## Enable PowerBroker Support
+
+When PowerBroker support is enabled in the asset configuration, the SSH connector will check if the `pbrun` command is present in the command parameter. If `pbrun` is detected in the command, the connector will automatically inject the configured password when executing the command, allowing seamless integration with PowerBroker-managed environments for elevated access control.
+
 ## Verify Last Reboot Time
 
 After successfully logging into your SSH server, run the command `     last reboot    ` which will
@@ -108,30 +112,31 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **timeout** | optional | numeric | Seconds before timeout (will be applicable for all actions) |
 **pseudo_terminal** | optional | boolean | Enable pseudo-terminal when running sudo commands |
 **disable_sha2** | optional | boolean | Disable SHA2 Algorithms (For Older SSH instances) |
+**powerbroker** | optional | boolean | Enable support for PowerBroker (pbrun) root delegation |
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validates endpoint connection \
-[execute program](#action-execute-program) - Executes a program on the remote machine \
-[list connections](#action-list-connections) - Lists all the network connections. Requires root privileges. Requires netstat to be installed \
-[block ip](#action-block-ip) - Add an iptables rule to the Linux server. Requires root privileges. Not supported on OS X \
-[list firewall rules](#action-list-firewall-rules) - Lists the rules in iptables. Requires root privileges. Not supported on OS X \
-[delete firewall rule](#action-delete-firewall-rule) - Delete a firewall rule. Requires root privileges. Not supported on OS X \
-[reboot system](#action-reboot-system) - Reboot the endpoint (Requires root privileges) \
-[shutdown system](#action-shutdown-system) - Shutdown the endpoint(Requires root privileges) \
-[terminate process](#action-terminate-process) - Terminate a process (Requires root privileges) \
-[logoff user](#action-logoff-user) - Logout a user on endpoint (Requires root privileges) \
-[list processes](#action-list-processes) - List processes on endpoint \
-[get disk usage](#action-get-disk-usage) - Retrieve disk usage from endpoint \
-[get memory usage](#action-get-memory-usage) - Retrieve memory usage from endpoint \
-[get file](#action-get-file) - Retrieve a file from the endpoint and save it to the vault \
+[test connectivity](#action-test-connectivity) - Validates endpoint connection <br>
+[execute program](#action-execute-program) - Executes a program on the remote machine <br>
+[list connections](#action-list-connections) - Lists all the network connections. Requires root privileges. Requires netstat to be installed <br>
+[block ip](#action-block-ip) - Add an iptables rule to the Linux server. Requires root privileges. Not supported on OS X <br>
+[list firewall rules](#action-list-firewall-rules) - Lists the rules in iptables. Requires root privileges. Not supported on OS X <br>
+[delete firewall rule](#action-delete-firewall-rule) - Delete a firewall rule. Requires root privileges. Not supported on OS X <br>
+[reboot system](#action-reboot-system) - Reboot the endpoint (Requires root privileges) <br>
+[shutdown system](#action-shutdown-system) - Shutdown the endpoint(Requires root privileges) <br>
+[terminate process](#action-terminate-process) - Terminate a process (Requires root privileges) <br>
+[logoff user](#action-logoff-user) - Logout a user on endpoint (Requires root privileges) <br>
+[list processes](#action-list-processes) - List processes on endpoint <br>
+[get disk usage](#action-get-disk-usage) - Retrieve disk usage from endpoint <br>
+[get memory usage](#action-get-memory-usage) - Retrieve memory usage from endpoint <br>
+[get file](#action-get-file) - Retrieve a file from the endpoint and save it to the vault <br>
 [put file](#action-put-file) - Put a file from the vault to another location
 
 ## action: 'test connectivity'
 
 Validates endpoint connection
 
-Type: **test** \
+Type: **test** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -146,7 +151,7 @@ No Output
 
 Executes a program on the remote machine
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Please provide a value for the 'timeout' parameter when executing continuous commands such as 'ping' so that the action does not keep running indefinitely.
@@ -179,7 +184,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Lists all the network connections. Requires root privileges. Requires netstat to be installed
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Executes the following command<br><code>sudo -S netstat -etnp</code><br>On OS X the following command is executed instead<br><code>sudo -S lsof -nP -i</code><br>Note that the name of the command in the output is limited to 9 characters.
@@ -225,7 +230,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add an iptables rule to the Linux server. Requires root privileges. Not supported on OS X
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 Need to specify either an IP or a port to block.<br>Executes the following command<br><code>sudo -S iptables -I \<DIRECTION> -p \<PROTOCOL> \<IP> \<PORT> -j DROP -m \<COMMENT></code><br>where the IP and PORT fields will block either source or destination based on the DIRECTION.<br>Only iptables is supported.
@@ -262,7 +267,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Lists the rules in iptables. Requires root privileges. Not supported on OS X
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Executes the following command<br><code>sudo -S iptables -L \<CHAIN> --line-numbers -n</code><br>Only iptables is supported.
@@ -301,7 +306,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete a firewall rule. Requires root privileges. Not supported on OS X
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 Executes the following command<br><code>sudo -S iptables -D \<CHAIN> \<NUMBER></code><br>Only iptables is supported.
@@ -332,7 +337,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Reboot the endpoint (Requires root privileges)
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 Executes the following command<br><code>sudo -S shutdown -r now</code>
@@ -359,7 +364,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Shutdown the endpoint(Requires root privileges)
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 Executes the following command<br><code>sudo -S shutdown -h now</code>
@@ -386,7 +391,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Terminate a process (Requires root privileges)
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 Executes the following command<br><code>sudo -S kill -SIGKILL \<PID></code>
@@ -415,7 +420,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Logout a user on endpoint (Requires root privileges)
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 Executes the following command<br><code>sudo -S pkill -SIGKILL \<USER_NAME></code><br>This will terminate any sessions with this user as well as any other processes which they are running. Be careful when running this with certain users (i.e. root).
@@ -444,7 +449,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List processes on endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Executes the following command<br><code>ps c -Ao user,uid,pid,ppid,stime,command</code>
@@ -477,7 +482,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve disk usage from endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -508,7 +513,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve memory usage from endpoint
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -540,7 +545,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve a file from the endpoint and save it to the vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 The file path needs to be an absolute path. For example, <b>/home/USER/file.tgz</b> instead of <b>~/file.tgz</b>.
@@ -572,7 +577,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Put a file from the vault to another location
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 The file path needs to be an absolute path. For example, <b>/home/USER/</b> instead of <b>~/USER</b>.

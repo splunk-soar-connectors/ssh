@@ -1,2 +1,2 @@
 **Unreleased**
-* Added support for PowerBroker pbrun 
+* Added support for PowerBroker pbrun * README fixes
