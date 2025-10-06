@@ -1,7 +1,7 @@
 # SSH
 
 Publisher: Splunk <br>
-Connector Version: 2.4.9 <br>
+Connector Version: 2.4.10 <br>
 Product Vendor: Generic <br>
 Product Name: SSH <br>
 Minimum Product Version: 6.2.0
