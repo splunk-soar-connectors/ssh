@@ -1,2 +1,1 @@
 **Unreleased**
-* Update cryptography to 46.0.7
