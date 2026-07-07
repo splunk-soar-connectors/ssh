@@ -1,12 +1,12 @@
 Splunk SOAR App: SSH
-Copyright (c) 2016-2025 Splunk Inc.
+Copyright (c) 2016-2026 Splunk Inc.
 Third Party Software Attributions:
 
 @@@@============================================================================
 
-Library: cryptography - 44.0.1
+Library: cryptography - 46.0.7
 Homepage: https://github.com/pyca/cryptography
-License: Apache Software License; BSD License
+License: Apache-2.0 OR BSD-3-Clause
 License Text:
 
 This software is made available under the terms of *either* of the licenses
