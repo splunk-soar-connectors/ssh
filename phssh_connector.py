@@ -367,7 +367,21 @@ class SshConnector(BaseConnector):
         script_file = param.get(SSH_JSON_SCRIPT_FILE)
         if script_file:
             try:
-                with open(script_file) as f:
+                success, message, vault_meta_info = ph_rules.vault_info(
+                    container_id=self.get_container_id(), vault_id=script_file
+                )
+                vault_meta_info = list(vault_meta_info or [])
+                if not success or not vault_meta_info:
+                    error_msg = f" Error Details: {unquote(message)}" if message else ""
+                    return action_result.set_status(
+                        phantom.APP_ERROR, f"{SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_MSG_ERR}.{error_msg}"
+                    )
+
+                vault_path = vault_meta_info[0].get("path")
+                if not vault_path:
+                    return action_result.set_status(phantom.APP_ERROR, SSH_UNABLE_TO_RETREIVE_VAULT_ITEM_MSG_ERR)
+
+                with open(vault_path) as f:
                     cmd = f.read()
             except Exception as e:
                 err = self._get_error_message_from_exception(e)

@@ -162,7 +162,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP to execute command on | string | `ip` `host name` |
 **command** | optional | Command to be executed on endpoint | string | |
-**script_file** | optional | Local path to shell script | string | |
+**script_file** | optional | Vault ID of a shell script attached to the current container | string | `vault id` |
 **timeout** | optional | Seconds before timeout. If an invalid value or 0 is entered, the timeout specified in the asset configuration will be used (default: 0) | numeric | |
 
 #### Action Output
@@ -172,7 +172,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 action_result.status | string | | success failed |
 action_result.parameter.command | string | | ls |
 action_result.parameter.ip_hostname | string | `ip` `host name` | 192.168.0.1 |
-action_result.parameter.script_file | string | | /opt/phantom/\<file_name> |
+action_result.parameter.script_file | string | `vault id` | 2b5f2d41d8b848e5ba40b348a9fd0f67 |
 action_result.parameter.timeout | numeric | | 30 |
 action_result.data.\*.output | string | | Shell Output |
 action_result.summary.exit_status | numeric | | 0 |
