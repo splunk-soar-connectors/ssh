@@ -939,7 +939,21 @@ class SshConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
 
         protocol = param[SSH_JSON_PROTOCOL]
-        direction = "INPUT" if param[SSH_JSON_DIRECTION].lower() == "in" else "OUTPUT"
+        direction_param = param[SSH_JSON_DIRECTION]
+        if not isinstance(direction_param, str):
+            return action_result.set_status(
+                phantom.APP_ERROR, "Invalid value for 'direction'. Accepted values: 'In', 'Out'"
+            )
+        direction_param = direction_param.strip().lower()
+        if direction_param == "in":
+            direction = "INPUT"
+        elif direction_param == "out":
+            direction = "OUTPUT"
+        else:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Invalid value {param[SSH_JSON_DIRECTION]!r} for 'direction'. Accepted values: 'In', 'Out'",
+            )
 
         remote_ip = param.get(SSH_JSON_REMOTE_IP)
         if remote_ip:
@@ -962,7 +976,7 @@ class SshConnector(BaseConnector):
             if direction == "INPUT":
                 port = f"--destination-port {remote_port}"
             else:
-                port = f"-dport {remote_port}"
+                port = f"--destination-port {remote_port}"
             no_port = False
         else:
             port = ""
