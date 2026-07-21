@@ -1,0 +1,45 @@
+name: PR Review Bot
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to review
+        required: true
+        type: number
+
+permissions: {}
+
+concurrency:
+  group: pr-review-bot-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Review pull request
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    uses: splunk-soar-connectors/AgenticPRReview/.github/workflows/pr-review.yml@sanchaga/agenticprreviewbot
+    with:
+      repo: ${{ github.repository }}
+      pr_number: ${{ github.event.pull_request.number || inputs.pr_number }}
+      circuit_base_url: ${{ vars.CIRCUIT_BASE_URL }}
+      circuit_model: ${{ vars.CIRCUIT_MODEL }}
+      circuit_token_url: ${{ vars.CIRCUIT_TOKEN_URL }}
+      publish_comments: true
+    secrets:
+      AI_REVIEW_APP_ID: ${{ secrets.AI_REVIEW_APP_ID }}
+      AI_REVIEW_INSTALLATION_ID: ${{ secrets.AI_REVIEW_INSTALLATION_ID }}
+      AI_REVIEW_PRIVATE_KEY: ${{ secrets.AI_REVIEW_PRIVATE_KEY }}
+      CIRCUIT_CLIENT_ID: ${{ secrets.CIRCUIT_CLIENT_ID }}
+      CIRCUIT_CLIENT_SECRET: ${{ secrets.CIRCUIT_CLIENT_SECRET }}
+      CIRCUIT_APP_KEY: ${{ secrets.CIRCUIT_APP_KEY }}
