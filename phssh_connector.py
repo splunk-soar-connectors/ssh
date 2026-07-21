@@ -220,7 +220,7 @@ class SshConnector(BaseConnector):
             self._shell_channel.settimeout(SEND_TIMEOUT)
             self._shell_channel.exec_command(command)
             self.debug_print("Calling 'get_output' method for processing the output")
-            ret_val, data, exit_status = self._get_output(action_result, timeout, passwd, suppress)
+            _ret_val, data, exit_status = self._get_output(action_result, timeout, passwd, suppress)
             output += data
 
             self.debug_print("Cleaning the output")
