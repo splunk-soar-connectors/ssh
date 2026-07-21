@@ -220,7 +220,7 @@ class SshConnector(BaseConnector):
             self._shell_channel.settimeout(SEND_TIMEOUT)
             self._shell_channel.exec_command(command)
             self.debug_print("Calling 'get_output' method for processing the output")
-            ret_val, data, exit_status = self._get_output(action_result, timeout, passwd, suppress)
+            _ret_val, data, exit_status = self._get_output(action_result, timeout, passwd, suppress)
             output += data
 
             self.debug_print("Cleaning the output")
@@ -499,8 +499,11 @@ class SshConnector(BaseConnector):
         if phantom.is_fail(status_code):
             return action_result.get_status()
 
+        action_result = self._output_for_exit_status(action_result, exit_status, stdout, stdout)
+        if phantom.is_fail(action_result.get_status()):
+            return action_result.get_status()
+
         action_result = self._parse_processes(action_result, stdout, cmd)
-        # action_result.update_summary({"exit_status": exit_status})
 
         return action_result.get_status()
 
