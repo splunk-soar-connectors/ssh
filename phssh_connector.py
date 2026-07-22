@@ -504,13 +504,16 @@ class SshConnector(BaseConnector):
         fuser = "" if self.OS_TYPE == OS_MAC else ":32"
         cmd = f"ps c -Ao user{fuser},uid,pid,ppid,stime,command"
 
-        status_code, stdout, _exit_status = self._send_command(cmd, action_result, timeout=self._timeout)
+        status_code, stdout, exit_status = self._send_command(cmd, action_result, timeout=self._timeout)
 
         if phantom.is_fail(status_code):
             return action_result.get_status()
 
+        action_result = self._output_for_exit_status(action_result, exit_status, stdout, stdout)
+        if phantom.is_fail(action_result.get_status()):
+            return action_result.get_status()
+
         action_result = self._parse_processes(action_result, stdout, cmd)
-        # action_result.update_summary({"exit_status": exit_status})
 
         return action_result.get_status()
 
