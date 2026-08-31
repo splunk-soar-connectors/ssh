@@ -16,6 +16,7 @@
 #
 # Phantom App imports
 import os
+import re
 import sys
 import time
 from contextlib import closing
@@ -43,6 +44,16 @@ os.sys.path.insert(0, f"{os.path.dirname(os.path.abspath(__file__))}/paramikossh
 
 
 class SshConnector(BaseConnector):
+    _CHAIN_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,29}$")
+
+    def _validate_chain(self, action_result, chain):
+        """Validate an optional iptables chain before shell command construction."""
+        if not chain:
+            return phantom.APP_SUCCESS, ""
+        if not isinstance(chain, str) or not self._CHAIN_PATTERN.fullmatch(chain):
+            action_result.set_status(phantom.APP_ERROR, "Invalid chain. Use 1-29 letters, numbers, '_' or '-'.")
+            return phantom.APP_ERROR, ""
+        return phantom.APP_SUCCESS, chain
     def __init__(self):
         super().__init__()
 
@@ -852,6 +863,9 @@ class SshConnector(BaseConnector):
                 return action_result.get_status()
         port = str(port)
         chain = param.get(SSH_JSON_CHAIN, "")
+        ret_val, chain = self._validate_chain(action_result, chain)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         cmd = f"sudo -S iptables -L {chain} --line-numbers -n"
 
@@ -1027,6 +1041,9 @@ class SshConnector(BaseConnector):
         if not root and passwd is None:
             return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
         chain = param[SSH_JSON_CHAIN]
+        ret_val, chain = self._validate_chain(action_result, chain)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         number = param[SSH_JSON_NUMBER]
 
         # integer validation for 'number' action parameter
