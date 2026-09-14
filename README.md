@@ -240,7 +240,7 @@ Need to specify either an IP or a port to block.<br>Executes the following comma
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP to add firewall rule to | string | `ip` `host name` |
-**remote_ip** | optional | Remote IP to block | string | `ip` `host name` |
+**remote_ip** | optional | Remote IP to block | string | `ip` |
 **remote_port** | optional | Remote port to block | numeric | `port` |
 **protocol** | required | Protocol to block | string | |
 **direction** | required | Inbound or outbound | string | |

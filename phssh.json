@@ -525,8 +525,7 @@
                     "data_type": "string",
                     "order": 1,
                     "contains": [
-                        "ip",
-                        "host name"
+                        "ip"
                     ],
                     "primary": true
                 },
@@ -552,7 +551,7 @@
                         "icmp",
                         "esp",
                         "ah",
-                        "setp"
+                        "sctp"
                     ]
                 },
                 "direction": {
