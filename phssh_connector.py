@@ -54,6 +54,7 @@ class SshConnector(BaseConnector):
             action_result.set_status(phantom.APP_ERROR, "Invalid chain. Use 1-29 letters, numbers, '_' or '-'.")
             return phantom.APP_ERROR, ""
         return phantom.APP_SUCCESS, chain
+
     def __init__(self):
         super().__init__()
 
