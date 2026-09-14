@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 3.0.0 <br>
 Product Vendor: Generic <br>
 Product Name: SSH <br>
-Minimum Product Version: 6.2.0
+Minimum Product Version: 6.3.0
 
 This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint
 
@@ -255,7 +255,7 @@ action_result.parameter.comment | string | | comment to add |
 action_result.parameter.direction | string | | In Out |
 action_result.parameter.ip_hostname | string | `ip` `host name` | 192.168.0.1 |
 action_result.parameter.protocol | string | | tcp |
-action_result.parameter.remote_ip | string | `ip` `host name` | 10.1.19.21 |
+action_result.parameter.remote_ip | string | `ip` | 10.1.19.21 |
 action_result.parameter.remote_port | numeric | `port` | 52678 |
 action_result.data.\*.output | string | | Shell Output |
 action_result.summary.exit_status | numeric | | 0 |

@@ -18,7 +18,7 @@
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "product_version_regex": ".*",
-    "min_phantom_version": "6.2.0",
+    "min_phantom_version": "6.3.0",
     "fips_compliant": true,
     "python_version": "3.9, 3.13",
     "latest_tested_versions": [
@@ -622,8 +622,7 @@
                     "data_path": "action_result.parameter.remote_ip",
                     "data_type": "string",
                     "contains": [
-                        "ip",
-                        "host name"
+                        "ip"
                     ],
                     "column_name": "Remote IP",
                     "column_order": 0,

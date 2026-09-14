@@ -13,36 +13,33 @@
 # limitations under the License.
 
 import shlex
-
-import pytest
+import unittest
 
 from phssh_security import quote_iptables_comment, quote_shell_argument, validate_iptables_protocol, validate_remote_ip
 
 
-def test_user_name_is_one_shell_argument() -> None:
-    value = "user; touch /tmp/pwned"
+class SecurityRegressionTests(unittest.TestCase):
+    def test_user_name_is_one_shell_argument(self) -> None:
+        value = "user; touch /tmp/pwned"
 
-    assert shlex.split(quote_shell_argument(value, "user_name")) == [value]
+        self.assertEqual(shlex.split(quote_shell_argument(value, "user_name")), [value])
 
+    def test_protocol_rejects_non_allowlisted_values(self) -> None:
+        for value in ["tcp; id", "-m", "", "setp"]:
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "Invalid protocol"):
+                validate_iptables_protocol(value)
 
-@pytest.mark.parametrize("value", ["tcp; id", "-m", "", "setp"])
-def test_protocol_rejects_non_allowlisted_values(value: str) -> None:
-    with pytest.raises(ValueError, match="Invalid protocol"):
-        validate_iptables_protocol(value)
+    def test_remote_ip_accepts_addresses_and_networks(self) -> None:
+        for value in ["192.0.2.5", "2001:db8::1", "192.0.2.0/24"]:
+            with self.subTest(value=value):
+                self.assertTrue(validate_remote_ip(value))
 
+    def test_remote_ip_rejects_shell_and_hostname_input(self) -> None:
+        for value in ["example.com", "192.0.2.1; id", "-j ACCEPT"]:
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "Invalid remote_ip"):
+                validate_remote_ip(value)
 
-@pytest.mark.parametrize("value", ["192.0.2.5", "2001:db8::1", "192.0.2.0/24"])
-def test_remote_ip_accepts_addresses_and_networks(value: str) -> None:
-    assert validate_remote_ip(value)
+    def test_comment_is_one_shell_argument(self) -> None:
+        value = "ticket'; touch /tmp/pwned; #"
 
-
-@pytest.mark.parametrize("value", ["example.com", "192.0.2.1; id", "-j ACCEPT"])
-def test_remote_ip_rejects_shell_and_hostname_input(value: str) -> None:
-    with pytest.raises(ValueError, match="Invalid remote_ip"):
-        validate_remote_ip(value)
-
-
-def test_comment_is_one_shell_argument() -> None:
-    value = "ticket'; touch /tmp/pwned; #"
-
-    assert shlex.split(quote_iptables_comment(value)) == [f"{value} -- Added by Phantom"]
+        self.assertEqual(shlex.split(quote_iptables_comment(value)), [f"{value} -- Added by Phantom"])
