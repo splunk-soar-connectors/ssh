@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 3.0.0 <br>
 Product Vendor: Generic <br>
 Product Name: SSH <br>
-Minimum Product Version: 6.3.0
+Minimum Product Version: 6.2.0
 
 This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint
 
