@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ipaddress
 import shlex
 
 
@@ -26,24 +25,22 @@ def quote_shell_argument(value, name):
     return shlex.quote(value)
 
 
+def quote_iptables_chain(value):
+    """Validate and quote an iptables chain name for a shell command."""
+    if not isinstance(value, str) or not value:
+        raise ValueError("Invalid chain. Provide a non-empty chain name")
+    if len(value.encode()) >= 29:
+        raise ValueError("Invalid chain. Chain names must be at most 28 bytes")
+    if value[0] in {"-", "!"} or any(character.isspace() for character in value):
+        raise ValueError("Invalid chain. Chain names cannot start with '-' or '!' or contain whitespace")
+    return shlex.quote(value)
+
+
 def validate_iptables_protocol(value):
     """Return an allowlisted iptables protocol."""
     if not isinstance(value, str) or value.strip().lower() not in IPTABLES_PROTOCOLS:
         raise ValueError("Invalid protocol. Use one of: ah, all, esp, icmp, sctp, tcp, udp, udplite")
     return value.strip().lower()
-
-
-def validate_remote_ip(value):
-    """Validate and canonicalize one IP address or CIDR network."""
-    if not isinstance(value, str) or not value.strip():
-        raise ValueError("Invalid remote_ip. Provide an IPv4/IPv6 address or CIDR network")
-    candidate = value.strip()
-    try:
-        if "/" in candidate:
-            return str(ipaddress.ip_network(candidate, strict=False))
-        return str(ipaddress.ip_address(candidate))
-    except ValueError as exc:
-        raise ValueError("Invalid remote_ip. Provide an IPv4/IPv6 address or CIDR network") from exc
 
 
 def quote_iptables_comment(value):

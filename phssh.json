@@ -525,7 +525,8 @@
                     "data_type": "string",
                     "order": 1,
                     "contains": [
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "primary": true
                 },
@@ -622,7 +623,8 @@
                     "data_path": "action_result.parameter.remote_ip",
                     "data_type": "string",
                     "contains": [
-                        "ip"
+                        "ip",
+                        "host name"
                     ],
                     "column_name": "Remote IP",
                     "column_order": 0,
