@@ -32,6 +32,7 @@ from phantom.vault import Vault as Vault
 
 # Import local
 from phssh_consts import *
+from phssh_security import quote_iptables_chain, quote_iptables_comment, quote_shell_argument, validate_iptables_protocol
 
 
 try:
@@ -589,7 +590,10 @@ class SshConnector(BaseConnector):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
 
-        user_name = param[SSH_JSON_USER]
+        try:
+            user_name = quote_shell_argument(param[SSH_JSON_USER], SSH_JSON_USER)
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
         passwd = self._password
         root = self._root
         if root:
@@ -603,7 +607,12 @@ class SshConnector(BaseConnector):
         if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        action_result = self._output_for_exit_status(action_result, exit_status, stdout, SSH_LOGOFF_USER_MSG.format(username=user_name))
+        action_result = self._output_for_exit_status(
+            action_result,
+            exit_status,
+            stdout,
+            SSH_LOGOFF_USER_MSG.format(username=param[SSH_JSON_USER]),
+        )
 
         return action_result.get_status()
 
@@ -852,6 +861,11 @@ class SshConnector(BaseConnector):
                 return action_result.get_status()
         port = str(port)
         chain = param.get(SSH_JSON_CHAIN, "")
+        if chain:
+            try:
+                chain = quote_iptables_chain(chain)
+            except ValueError as exc:
+                return action_result.set_status(phantom.APP_ERROR, str(exc))
 
         cmd = f"sudo -S iptables -L {chain} --line-numbers -n"
 
@@ -937,7 +951,10 @@ class SshConnector(BaseConnector):
         if not root and passwd is None:
             return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
 
-        protocol = param[SSH_JSON_PROTOCOL]
+        try:
+            protocol = validate_iptables_protocol(param[SSH_JSON_PROTOCOL])
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
         direction_param = param[SSH_JSON_DIRECTION]
         if not isinstance(direction_param, str):
             return action_result.set_status(phantom.APP_ERROR, "Invalid value for 'direction'. Accepted values: 'In', 'Out'")
@@ -954,6 +971,10 @@ class SshConnector(BaseConnector):
 
         remote_ip = param.get(SSH_JSON_REMOTE_IP)
         if remote_ip:
+            try:
+                remote_ip = quote_shell_argument(remote_ip, SSH_JSON_REMOTE_IP)
+            except ValueError as exc:
+                return action_result.set_status(phantom.APP_ERROR, str(exc))
             if direction == "INPUT":
                 remote_ip = f"-s {remote_ip}"
             else:
@@ -978,11 +999,7 @@ class SshConnector(BaseConnector):
         else:
             port = ""
 
-        user_comment = param.get(SSH_JSON_COMMENT)
-        if user_comment:
-            comment = f"-m comment --comment '{user_comment} -- Added by Phantom'"
-        else:
-            comment = "-m comment --comment 'Added by Phantom'"
+        comment = f"-m comment --comment {quote_iptables_comment(param.get(SSH_JSON_COMMENT))}"
 
         if no_ip and no_port:
             return action_result.set_status(phantom.APP_ERROR, SSH_REMOTE_IP_OR_PORT_NOT_SPECIFIED_MSG_ERR)
@@ -1026,7 +1043,10 @@ class SshConnector(BaseConnector):
             passwd = None
         if not root and passwd is None:
             return action_result.set_status(phantom.APP_ERROR, SSH_NEED_PW_FOR_ROOT_ERR)
-        chain = param[SSH_JSON_CHAIN]
+        try:
+            chain = quote_iptables_chain(param[SSH_JSON_CHAIN])
+        except ValueError as exc:
+            return action_result.set_status(phantom.APP_ERROR, str(exc))
         number = param[SSH_JSON_NUMBER]
 
         # integer validation for 'number' action parameter
