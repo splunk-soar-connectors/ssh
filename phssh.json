@@ -5,6 +5,9 @@
     "contributors": [
         {
             "name": "Alan Shaikh"
+        },
+        {
+            "name": "Gary Ian Rokas"
         }
     ],
     "description": "This app supports executing various endpoint-based investigative and containment actions on an SSH endpoint",
@@ -2147,7 +2150,7 @@
             },
             {
                 "module": "simplejson",
-                "input_file": "wheels/py313/simplejson-3.17.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py313/simplejson-3.20.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             }
         ]
     },
@@ -2179,11 +2182,43 @@
             },
             {
                 "module": "simplejson",
-                "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py39/simplejson-3.20.2-cp39-cp39-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl"
             },
             {
                 "module": "typing_extensions",
                 "input_file": "wheels/py3/typing_extensions-4.16.0-py3-none-any.whl"
+            }
+        ]
+    },
+    "pip313_dependencies_aarch64": {
+        "wheel": [
+            {
+                "module": "bcrypt",
+                "input_file": "wheels/py39/bcrypt-5.0.0-cp39-abi3-manylinux_2_28_aarch64.whl"
+            },
+            {
+                "module": "cffi",
+                "input_file": "wheels/py313/cffi-2.1.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl"
+            },
+            {
+                "module": "cryptography",
+                "input_file": "wheels/py3/cryptography-46.0.7-cp311-abi3-manylinux_2_28_aarch64.whl"
+            },
+            {
+                "module": "paramiko",
+                "input_file": "wheels/py3/paramiko-3.5.0-py3-none-any.whl"
+            },
+            {
+                "module": "pycparser",
+                "input_file": "wheels/py3/pycparser-3.0-py3-none-any.whl"
+            },
+            {
+                "module": "pynacl",
+                "input_file": "wheels/py3/pynacl-1.6.2-cp38-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl"
+            },
+            {
+                "module": "simplejson",
+                "input_file": "wheels/py313/simplejson-3.20.2-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             }
         ]
     }
