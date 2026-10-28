@@ -2139,7 +2139,7 @@
             },
             {
                 "module": "pycparser",
-                "input_file": "wheels/py3/pycparser-3.0-py3-none-any.whl"
+                "input_file": "wheels/py3/pycparser-3.12-py3-none-any.whl"
             },
             {
                 "module": "pynacl",
