@@ -12,10 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import shlex
+
+import paramiko
 
 
 IPTABLES_PROTOCOLS = frozenset({"all", "tcp", "udp", "udplite", "icmp", "esp", "ah", "sctp"})
+
+
+def configure_host_key_verification(client, server, asset_key, action_key=None):
+    """Pin a supplied public host key, or preserve legacy trust when none is supplied."""
+    expected_key = action_key if action_key not in (None, "") else asset_key
+    if expected_key is None or expected_key == "":
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        return
+
+    try:
+        if not isinstance(expected_key, str) or "\n" in expected_key or "\r" in expected_key:
+            raise ValueError("Expected one public host key")
+        key_type, key_data, *_comment = expected_key.split()
+        host_key = paramiko.PKey.from_type_string(key_type, base64.b64decode(key_data, validate=True))
+    except Exception as e:
+        raise ValueError("Invalid ssh_host_key. Use OpenSSH public-key format: <key-type> <base64-key> [comment]") from e
+
+    client.get_host_keys().add(server, host_key.get_name(), host_key)
+    client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
 
 def quote_shell_argument(value, name):

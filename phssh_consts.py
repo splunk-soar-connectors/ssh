@@ -43,6 +43,7 @@ SSH_JSON_USERNAME = "username"
 SSH_JSON_ROOT = "root"
 SSH_JSON_PASSWORD = "password"  # pragma: allowlist secret
 SSH_JSON_RSA_KEY = "rsa_key_file"
+SSH_JSON_HOST_KEY = "ssh_host_key"
 
 SSH_JSON_ENDPOINT = "ip_hostname"
 SSH_JSON_PID = "pid"

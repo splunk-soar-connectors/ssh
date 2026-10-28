@@ -74,6 +74,35 @@ key must be specified. For example, if keys are added using username **testuser*
 directory **/home/testuser** then **/home/testuser/.ssh/id_rsa** should be specified as the RSA key
 file.
 
+## Optional SSH server host-key verification
+
+Set `ssh_host_key` in the asset configuration to verify the SSH server's identity before
+authentication. Actions that accept an `ip_hostname` also accept an optional `ssh_host_key`.
+A non-empty action value takes precedence over the asset value. An omitted or empty action value
+uses the asset value, and Test Connectivity uses the asset value.
+
+Supply one server public host key in OpenSSH public-key format:
+
+```text
+<key-type> <base64-public-key> [optional comment]
+```
+
+For example, the key type can be `ssh-ed25519`, `ecdsa-sha2-nistp256`, or `ssh-rsa`, as supported
+by Paramiko. Obtain the public host key from the server administrator through a trusted channel.
+This is the server's public host key, not the user authentication key configured in
+`rsa_key_file`. A fingerprint alone, a `known_hosts` line with a hostname prefix, and multiple
+key lines are not accepted.
+
+When a key is supplied, an invalid value or a different server key causes the action to fail
+before authentication. This verification also applies when `disable_sha2` is enabled. To connect
+to a different server, supply that server's trusted key in the action or use a separate asset.
+Update the configured expected key through a trusted channel after a server host-key rotation.
+
+When neither value is supplied, the connector preserves its existing noninteractive behavior
+and accepts unknown server host keys. Host-key verification is therefore opt-in; existing
+assets and playbooks require no change. No host keys are learned or persisted by the new
+verification setting.
+
 ## Disable SHA2 Algorithms Parameter
 
 The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does

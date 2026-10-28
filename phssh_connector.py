@@ -32,7 +32,13 @@ from phantom.vault import Vault as Vault
 
 # Import local
 from phssh_consts import *
-from phssh_security import quote_iptables_chain, quote_iptables_comment, quote_shell_argument, validate_iptables_protocol
+from phssh_security import (
+    configure_host_key_verification,
+    quote_iptables_chain,
+    quote_iptables_comment,
+    quote_shell_argument,
+    validate_iptables_protocol,
+)
 
 
 try:
@@ -109,6 +115,7 @@ class SshConnector(BaseConnector):
         self._password = config.get(SSH_JSON_PASSWORD)
         self._root = config.get(SSH_JSON_ROOT, False)
         self._rsa_key_file = config.get(SSH_JSON_RSA_KEY)
+        self._ssh_host_key = config.get(SSH_JSON_HOST_KEY)
 
         self._pseudo_terminal = config.get(SSH_JSON_PSEUDO_TERMINAL, False)
         self._disable_sha2 = config.get(SSH_JSON_DISABLE_SHA2, False)
@@ -127,7 +134,7 @@ class SshConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _start_connection(self, action_result, server):
+    def _start_connection(self, action_result, server, ssh_host_key=None):
         self.debug_print(f"PARAMIKO VERSION. {paramiko.__version__}")
 
         if self._rsa_key_file is None and self._password is None:
@@ -155,7 +162,10 @@ class SshConnector(BaseConnector):
             key = None
 
         self._ssh_client = paramiko.SSHClient()
-        self._ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            configure_host_key_verification(self._ssh_client, server, self._ssh_host_key, ssh_host_key)
+        except ValueError as e:
+            return action_result.set_status(phantom.APP_ERROR, str(e))
 
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, server)
         try:
@@ -314,7 +324,7 @@ class SshConnector(BaseConnector):
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, SSH_HOSTNAME_OR_IP_NOT_SPECIFIED_MSG_ERR)
 
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             self.save_progress(SSH_CONNECTIVITY_TEST_ERR)
             return action_result.get_status()
@@ -346,7 +356,7 @@ class SshConnector(BaseConnector):
         endpoint = param[SSH_JSON_ENDPOINT]
 
         self.debug_print("Calling 'start_connection'..")
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -415,7 +425,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -456,7 +466,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -477,7 +487,7 @@ class SshConnector(BaseConnector):
 
         # verifying whether the endpoint has successfully shutdown or not
         time.sleep(15)
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             d = {"output": SSH_SHELL_NO_ERR}
             action_result.add_data(d)
@@ -493,7 +503,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -552,7 +562,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -585,7 +595,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -621,7 +631,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -837,7 +847,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -934,7 +944,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -1029,7 +1039,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -1089,7 +1099,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -1129,7 +1139,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -1245,7 +1255,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)
@@ -1280,7 +1290,7 @@ class SshConnector(BaseConnector):
         self.add_action_result(action_result)
 
         endpoint = param[SSH_JSON_ENDPOINT]
-        status_code = self._start_connection(action_result, endpoint)
+        status_code = self._start_connection(action_result, endpoint, param.get(SSH_JSON_HOST_KEY))
         if phantom.is_fail(status_code):
             return action_result.get_status()
         self.debug_print(SSH_CONNECTIVITY_ESTABLISHED)

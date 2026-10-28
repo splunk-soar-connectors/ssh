@@ -72,6 +72,12 @@
             "data_type": "boolean",
             "order": 8,
             "description": "Enable support for PowerBroker (pbrun) root delegation"
+        },
+        "ssh_host_key": {
+            "data_type": "string",
+            "order": 9,
+            "required": false,
+            "description": "Expected SSH server public host key in OpenSSH format (optional; actions can override)"
         }
     },
     "actions": [
@@ -126,6 +132,12 @@
                     "order": 3,
                     "description": "Seconds before timeout. If an invalid value or 0 is entered, the timeout specified in the asset configuration will be used (default: 0)",
                     "default": 0
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 4
                 }
             },
             "output": [
@@ -214,6 +226,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -283,6 +299,12 @@
                     ],
                     "order": 4,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 5
                 }
             },
             "render": {
@@ -493,6 +515,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -569,6 +595,12 @@
                     "description": "Leave a comment",
                     "order": 5,
                     "data_type": "string"
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 6
                 }
             },
             "output": [
@@ -680,6 +712,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -731,6 +767,12 @@
                     "description": "Chain to match (INPUT, OUTPUT, etc.)",
                     "data_type": "string",
                     "order": 3
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 4
                 }
             },
             "render": {
@@ -873,6 +915,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -911,6 +957,12 @@
                     "order": 2,
                     "description": "Number of rule to delete",
                     "required": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 3
                 }
             },
             "output": [
@@ -989,6 +1041,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -1021,6 +1077,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 1
                 }
             },
             "render": {
@@ -1089,6 +1151,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1115,6 +1181,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 1
                 }
             },
             "render": {
@@ -1183,6 +1255,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1219,6 +1295,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 2
                 }
             },
             "render": {
@@ -1299,6 +1381,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1335,6 +1421,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 2
                 }
             },
             "render": {
@@ -1415,6 +1507,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1441,6 +1537,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 1
                 }
             },
             "render": {
@@ -1566,6 +1668,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1587,6 +1693,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 1
                 }
             },
             "render": {
@@ -1705,6 +1817,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1726,6 +1842,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 1
                 }
             },
             "render": {
@@ -1855,6 +1977,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1887,6 +2013,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 2
                 }
             },
             "render": {
@@ -1984,6 +2116,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -2026,6 +2162,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "ssh_host_key": {
+                    "data_type": "string",
+                    "required": false,
+                    "description": "Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied",
+                    "order": 3
                 }
             },
             "render": {
@@ -2114,6 +2256,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ssh_host_key",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
