@@ -84,6 +84,35 @@ key must be specified. For example, if keys are added using username **testuser*
 directory **/home/testuser** then **/home/testuser/.ssh/id_rsa** should be specified as the RSA key
 file.
 
+## Optional SSH server host-key verification
+
+Set `ssh_host_key` in the asset configuration to verify the SSH server's identity before
+authentication. Actions that accept an `ip_hostname` also accept an optional `ssh_host_key`.
+A non-empty action value takes precedence over the asset value. An omitted or empty action value
+uses the asset value, and Test Connectivity uses the asset value.
+
+Supply one server public host key in OpenSSH public-key format:
+
+```text
+<key-type> <base64-public-key> [optional comment]
+```
+
+For example, the key type can be `ssh-ed25519`, `ecdsa-sha2-nistp256`, or `ssh-rsa`, as supported
+by Paramiko. Obtain the public host key from the server administrator through a trusted channel.
+This is the server's public host key, not the user authentication key configured in
+`rsa_key_file`. A fingerprint alone, a `known_hosts` line with a hostname prefix, and multiple
+key lines are not accepted.
+
+When a key is supplied, an invalid value or a different server key causes the action to fail
+before authentication. This verification also applies when `disable_sha2` is enabled. To connect
+to a different server, supply that server's trusted key in the action or use a separate asset.
+Update the configured expected key through a trusted channel after a server host-key rotation.
+
+When neither value is supplied, the connector preserves its existing noninteractive behavior
+and accepts unknown server host keys. Host-key verification is therefore opt-in; existing
+assets and playbooks require no change. No host keys are learned or persisted by the new
+verification setting.
+
 ## Disable SHA2 Algorithms Parameter
 
 The 'disable_sha2' parameter in the asset can be checked when the SSH instance is old one which does
@@ -113,6 +142,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **pseudo_terminal** | optional | boolean | Enable pseudo-terminal when running sudo commands |
 **disable_sha2** | optional | boolean | Disable SHA2 Algorithms (For Older SSH instances) |
 **powerbroker** | optional | boolean | Enable support for PowerBroker (pbrun) root delegation |
+**ssh_host_key** | optional | string | Expected SSH server public host key in OpenSSH format (optional; actions can override) |
 
 ### Supported Actions
 
@@ -164,6 +194,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **command** | optional | Command to be executed on endpoint | string | |
 **script_file** | optional | Vault ID of a shell script attached to the current container | string | `vault id` |
 **timeout** | optional | Seconds before timeout. If an invalid value or 0 is entered, the timeout specified in the asset configuration will be used (default: 0) | numeric | |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -179,6 +210,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'list connections'
 
@@ -198,6 +230,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **local_port** | optional | Local port to match | numeric | `port` |
 **remote_addr** | optional | Remote IP to filter on | string | `ip` |
 **remote_port** | optional | Remote port to match | numeric | `port` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -225,6 +258,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'block ip'
 
@@ -245,6 +279,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **protocol** | required | Protocol to block | string | |
 **direction** | required | Inbound or outbound | string | |
 **comment** | optional | Leave a comment | string | |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -262,6 +297,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'list firewall rules'
 
@@ -280,6 +316,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **protocol** | optional | Protocol to match | string | |
 **port** | optional | Port to match | numeric | `port` |
 **chain** | optional | Chain to match (INPUT, OUTPUT, etc.) | string | |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -301,6 +338,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'delete firewall rule'
 
@@ -318,6 +356,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **ip_hostname** | required | Hostname/IP of endpoint | string | `ip` `host name` |
 **chain** | required | Name of chain (INPUT, OUTPUT, etc.) | string | |
 **number** | required | Number of rule to delete | numeric | |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -332,6 +371,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'reboot system'
 
@@ -347,6 +387,7 @@ Executes the following command<br><code>sudo -S shutdown -r now</code>
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP of server to reboot | string | `ip` `host name` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -359,6 +400,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Exit status: -1. Please refer the docs to verify the last reboot time |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'shutdown system'
 
@@ -374,6 +416,7 @@ Executes the following command<br><code>sudo -S shutdown -h now</code>
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP of server to shutdown | string | `ip` `host name` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -386,6 +429,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Endpoint successfully shutdown. Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'terminate process'
 
@@ -402,6 +446,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP of endpoint | string | `ip` `host name` |
 **pid** | required | PID of process to terminate | numeric | `pid` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -415,6 +460,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'logoff user'
 
@@ -431,6 +477,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP of endpoint | string | `ip` `host name` |
 **user_name** | required | Name of user to logout | string | `user name` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -444,6 +491,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Command successfully executed and shell returned no errors |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'list processes'
 
@@ -459,6 +507,7 @@ Executes the following command<br><code>ps c -Ao user,uid,pid,ppid,stime,command
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP of endpoint | string | `ip` `host name` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -477,6 +526,7 @@ action_result.summary.total_processes | numeric | | 12 |
 action_result.message | string | | Total processes: 10 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'get disk usage'
 
@@ -490,6 +540,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP to execute command on | string | `ip` `host name` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -508,6 +559,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Successfully executed command |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'get memory usage'
 
@@ -521,6 +573,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP to execute command on | string | `ip` `host name` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -540,6 +593,7 @@ action_result.summary.exit_status | numeric | | 0 |
 action_result.message | string | | Successfully executed command |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'get file'
 
@@ -556,6 +610,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ip_hostname** | required | Hostname/IP to execute command on | string | `ip` `host name` |
 **file_path** | required | Full path of the file to download (include filename) | string | `file path` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -572,6 +627,7 @@ action_result.summary.vault_id | string | `vault id` | dc871f816c4d179f3a3cea24b
 action_result.message | string | | Transferred file |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ## action: 'put file'
 
@@ -589,6 +645,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **ip_hostname** | required | Hostname/IP to execute command on | string | `ip` `host name` |
 **vault_id** | required | Vault ID of file | string | `vault id` |
 **file_destination** | required | File destination path (exclude filename) | string | `file path` |
+**ssh_host_key** | optional | Expected SSH server public host key in OpenSSH format; overrides the asset value when supplied | string | |
 
 #### Action Output
 
@@ -603,6 +660,7 @@ action_result.summary.file_sent | string | `file path` | /home/USER/file.tgz |
 action_result.message | string | | File sent: /home/USER/file.tgz |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.ssh_host_key | string | | |
 
 ______________________________________________________________________
 

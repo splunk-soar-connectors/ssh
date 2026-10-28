@@ -1,1 +1,3 @@
 **Unreleased**
+
+* Add optional SSH server host-key verification with action-level overrides and asset-level defaults.
