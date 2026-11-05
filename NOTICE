@@ -4,7 +4,7 @@ Third Party Software Attributions:
 
 @@@@============================================================================
 
-Library: cryptography - 46.0.7
+Library: cryptography - 50.0.0
 Homepage: https://github.com/pyca/cryptography
 License: Apache-2.0 OR BSD-3-Clause
 License Text:

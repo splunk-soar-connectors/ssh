@@ -2277,7 +2277,7 @@
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py3/cryptography-46.0.7-cp311-abi3-manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py3/cryptography-50.0.0-cp311-abi3-manylinux_2_28_x86_64.whl"
             },
             {
                 "module": "paramiko",
@@ -2309,7 +2309,7 @@
             },
             {
                 "module": "cryptography",
-                "input_file": "wheels/py3/cryptography-46.0.7-cp38-abi3-manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/py39/cryptography-50.0.0-cp39-abi3-manylinux_2_28_x86_64.whl"
             },
             {
                 "module": "paramiko",
